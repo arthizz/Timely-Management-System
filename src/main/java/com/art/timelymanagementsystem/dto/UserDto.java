@@ -2,10 +2,12 @@ package com.art.timelymanagementsystem.dto;
 
 import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.entities.UserProfile;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@Getter
 public class UserDto {
     private int id;
     private String name;
