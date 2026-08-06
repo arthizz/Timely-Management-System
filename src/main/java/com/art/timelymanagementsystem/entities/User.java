@@ -38,8 +38,8 @@ public class User {
 
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserProfile userProfile;
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<TimeLog> timeLogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<TimeLog> timeLogs;
 
 }

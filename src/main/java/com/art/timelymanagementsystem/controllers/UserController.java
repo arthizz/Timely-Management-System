@@ -1,6 +1,7 @@
 package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.UserDto;
+import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.entities.UserProfile;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.UserProfileRepository;
@@ -23,14 +24,15 @@ public class UserController {
     public List<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "id") String sort){
 
         userRepository.findAll().forEach(user -> {
-            UserProfile profile = user.getUserProfile();
+            TimeLog timeLog = user.getTimeLogs().getFirst();
 
-            if(profile != null){
+            if(timeLog != null){
 
-                System.out.println("first_name: " + profile.getFirstName());
-                System.out.println("last_name: " + profile.getLastName());
+                System.out.println("Time In: " + timeLog.getTimeIn());
+                System.out.println("Time Out: " + timeLog.getTimeOut());
 
             }
+
         });
 
         return userRepository.findAll(Sort.by(sort))

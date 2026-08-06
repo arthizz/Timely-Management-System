@@ -36,7 +36,7 @@ public class TimeLog {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "timeLogId", cascade = CascadeType.ALL)
-    private List<TimeLogPause> timeLogPause = new ArrayList<>();
+    @OneToMany(mappedBy = "timeLogId", fetch = FetchType.EAGER)
+    private List<TimeLogPause> timeLogPause;
 
 }

@@ -5,6 +5,7 @@ import com.art.timelymanagementsystem.entities.UserProfile;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,5 +18,5 @@ public class UserDto {
     private Short userLevelId;
     private LocalDateTime createdAt;
     private UserProfileDto userProfile;
-    private TimeLogDto timeLog;
+    private List<TimeLogDto> timeLogs;
 }
