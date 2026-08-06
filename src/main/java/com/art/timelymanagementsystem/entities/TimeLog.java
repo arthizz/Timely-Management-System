@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @ToString
@@ -14,27 +16,27 @@ import java.time.LocalDateTime;
 public class TimeLog {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "time_in")
+    @Column(name = "time_in", nullable = false)
     private LocalDateTime timeIn;
 
-    @Column(name = "time_out")
+    @Column(name = "time_out", nullable = false)
     private LocalDateTime timeOut;
 
-    @Column(name = "is_night_shift")
+    @Column(name = "is_night_shift", nullable = false)
     private Boolean isNightShift;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "time_log", cascade = CascadeType.ALL)
-    private TimeLogPause timeLogPause;
+    @OneToMany(mappedBy = "timeLogId", cascade = CascadeType.ALL)
+    private List<TimeLogPause> timeLogPause = new ArrayList<>();
 
 }

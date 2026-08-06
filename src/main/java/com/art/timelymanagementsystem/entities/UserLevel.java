@@ -19,7 +19,7 @@ public class UserLevel {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
 }

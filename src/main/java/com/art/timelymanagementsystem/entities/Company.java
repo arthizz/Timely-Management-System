@@ -1,9 +1,6 @@
 package com.art.timelymanagementsystem.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,26 +14,26 @@ import java.time.LocalDateTime;
 public class Company {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "company_name")
+    @Column(name = "company_name", nullable = false)
     private String companyName;
 
-    @Column(name = "company_address")
+    @Column(name = "company_address", nullable = false)
     private String companyAddress;
 
-    @Column(name = "company_admin_email")
+    @Column(name = "company_admin_email", nullable = false)
     private String companyAdminEmail;
 
-    @Column(name = "is_verified")
+    @Column(name = "is_verified", nullable = false)
     private Boolean isVerified;
 
-    @Column(name = "is_subscribed")
+    @Column(name = "is_subscribed", nullable = false)
     private Boolean isSubscribed;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
 }

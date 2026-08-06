@@ -6,14 +6,16 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
     private Long id;
-    private String name;
+    private String userName;
     private String email;
     private Short userLevelId;
     private LocalDateTime createdAt;
-    private UserProfile userProfile;
-    private TimeLog timeLog;
+    private UserProfileDto userProfile;
+    private TimeLogDto timeLog;
 }

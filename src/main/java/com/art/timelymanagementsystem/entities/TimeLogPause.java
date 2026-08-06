@@ -14,18 +14,18 @@ import java.time.LocalDateTime;
 public class TimeLogPause {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "time_log_id")
-    private Long timeLogId;
+    @JoinColumn(name = "time_log_id", nullable = false)
+    private TimeLog timeLogId;
 
-    @Column(name = "time_resume")
+    @Column(name = "time_resume", nullable = false)
     private LocalDateTime timeResume;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
 }
