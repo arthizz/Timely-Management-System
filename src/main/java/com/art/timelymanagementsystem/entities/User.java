@@ -39,7 +39,7 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserProfile userProfile;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<TimeLog> timeLogs;
 
 }

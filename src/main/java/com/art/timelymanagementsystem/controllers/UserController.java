@@ -1,6 +1,7 @@
 package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.UserDto;
+import com.art.timelymanagementsystem.dto.UserWithTimeLogsDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.entities.UserProfile;
 import com.art.timelymanagementsystem.mappers.UserMapper;
@@ -8,6 +9,9 @@ import com.art.timelymanagementsystem.repositories.UserProfileRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,21 +27,37 @@ public class UserController {
     @GetMapping
     public List<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "id") String sort){
 
-        userRepository.findAll().forEach(user -> {
-            TimeLog timeLog = user.getTimeLogs().getFirst();
-
-            if(timeLog != null){
-
-                System.out.println("Time In: " + timeLog.getTimeIn());
-                System.out.println("Time Out: " + timeLog.getTimeOut());
-
-            }
-
-        });
+//        userRepository.findAll().forEach(user -> {
+//            TimeLog timeLog = user.getTimeLogs().getFirst();
+//
+//            if(timeLog != null){
+//
+//                System.out.println("Time In: " + timeLog.getTimeIn());
+//                System.out.println("Time Out: " + timeLog.getTimeOut());
+//
+//            }
+//
+//        });
 
         return userRepository.findAll(Sort.by(sort))
                 .stream().map(userMapper::toDto)
                 .toList();
+
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUser(@PathVariable Long id){
+
+        var user = userRepository.findById(id).map(userMapper::toDto).orElse(null);
+
+        if(user == null){
+
+            return ResponseEntity.notFound().build();
+
+        }
+
+        return ResponseEntity.ok(user);
 
     }
 
