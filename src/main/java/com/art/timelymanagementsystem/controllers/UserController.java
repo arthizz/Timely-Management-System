@@ -3,10 +3,13 @@ package com.art.timelymanagementsystem.controllers;
 import com.art.timelymanagementsystem.dto.UserDto;
 import com.art.timelymanagementsystem.dto.UserWithTimeLogsDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
+import com.art.timelymanagementsystem.entities.User;
 import com.art.timelymanagementsystem.entities.UserProfile;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.UserProfileRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
+import com.art.timelymanagementsystem.request.UserRequest;
+import com.art.timelymanagementsystem.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -23,25 +26,22 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final UserMapper userMapper;
+    private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "id") String sort){
+    public ResponseEntity<List<UserDto>> getAllUsers(@RequestParam(required = false, defaultValue = "id") String sort){
 
-//        userRepository.findAll().forEach(user -> {
-//            TimeLog timeLog = user.getTimeLogs().getFirst();
-//
-//            if(timeLog != null){
-//
-//                System.out.println("Time In: " + timeLog.getTimeIn());
-//                System.out.println("Time Out: " + timeLog.getTimeOut());
-//
-//            }
-//
-//        });
-
-        return userRepository.findAll(Sort.by(sort))
+        var userList =  userRepository.findAll(Sort.by(sort))
                 .stream().map(userMapper::toDto)
                 .toList();
+
+        if(userList.isEmpty()){
+
+            return ResponseEntity.notFound().build();
+
+        }
+
+        return ResponseEntity.ok(userList);
 
     }
 
@@ -62,9 +62,32 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createNewUser(@RequestBody UserDto data){
+    public UserDto createNewUser(@RequestBody UserRequest request){
+//        For Later
+//        var user = userMapper.toEntity(request);
+//        System.out.println(user);
 
-        return data;
+        return userService.createUser(request);
+
+
+    }
+
+    @GetMapping("/userlevelid")
+    public ResponseEntity<List<UserDto>> findUserByLevel(@RequestParam(required = false, name="userLevelId") Byte userLevelId){
+
+        List<User> users;
+        System.out.println("this is test");
+        if(userLevelId != null){
+
+            users = userRepository.findByUserLevelId(userLevelId);
+
+        }else{
+
+            users = userRepository.findAll();
+
+        }
+
+        return ResponseEntity.ok(users.stream().map(userMapper::toDto).toList());
 
     }
 

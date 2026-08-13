@@ -36,7 +36,7 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private UserProfile userProfile;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

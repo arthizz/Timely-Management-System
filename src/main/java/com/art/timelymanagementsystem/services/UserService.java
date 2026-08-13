@@ -23,18 +23,17 @@ public class UserService {
 
     public UserDto createUser(UserRequest userRequest){
 
-        var useLevel = userLevelRepository.findById((long)userRequest.getUserLevelId()).orElseThrow(() -> new RuntimeException("User Level not exists"));
+//        var userLevel = userLevelRepository.findById(1L).orElseThrow(() -> new RuntimeException("User Level not exists"));
+//        System.out.println(userLevel);
         var newUser = new User();
 
-        newUser.setUserName(userRequest.getUsername());
+        newUser.setUserName(userRequest.getUserName());
         newUser.setEmail(userRequest.getEmail());
         newUser.setPassword(userRequest.getPassword());
         newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setUserLevelId(userRequest.getUserLevelId());
 
-        var createdUser = userRepository.save(newUser);
-        var userProfile = userProfileService.CreateUserProfile(userRequest, newUser);
-
-        return userMapper.toDto(createdUser);
+        return userProfileService.CreateUserProfile(userRequest, newUser);
 
     }
 
