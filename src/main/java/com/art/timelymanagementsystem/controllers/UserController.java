@@ -11,6 +11,7 @@ import com.art.timelymanagementsystem.repositories.UserRepository;
 import com.art.timelymanagementsystem.request.UserRequest;
 import com.art.timelymanagementsystem.services.UserService;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -34,12 +35,6 @@ public class UserController {
         var userList =  userRepository.findAll(Sort.by(sort))
                 .stream().map(userMapper::toDto)
                 .toList();
-
-        if(userList.isEmpty()){
-
-            return ResponseEntity.notFound().build();
-
-        }
 
         return ResponseEntity.ok(userList);
 
@@ -88,6 +83,21 @@ public class UserController {
         }
 
         return ResponseEntity.ok(users.stream().map(userMapper::toDto).toList());
+
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest){
+
+        var user = userRepository.findById(id).orElse(null);
+
+        if(user == null){
+
+            return ResponseEntity.notFound().build();
+
+        }
+
+        return userService.updateUser(user, userRequest);
 
     }
 

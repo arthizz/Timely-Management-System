@@ -8,6 +8,7 @@ import com.art.timelymanagementsystem.repositories.UserLevelRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
 import com.art.timelymanagementsystem.request.UserRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +25,35 @@ public class UserService {
 
         var newUser = new User();
 
-        newUser.setUserName(userRequest.getUserName());
-        newUser.setEmail(userRequest.getEmail());
-        newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        System.out.println(newUser);
-        newUser.setCreatedAt(LocalDateTime.now());
-        newUser.setUserLevelId(userRequest.getUserLevelId());
+        newUser = this.setUserData(newUser, userRequest);
 
         return userProfileService.CreateUserProfile(userRequest, newUser);
+
+    }
+
+    public ResponseEntity<UserDto> updateUser(User user, UserRequest userRequest){
+
+        user = this.setUserData(user, userRequest);
+
+        return userProfileService.updateUserProfile(user, userRequest);
+
+    }
+
+    public User setUserData(User user, UserRequest userRequest){
+
+        user.setUserName(userRequest.getUserName());
+        user.setEmail(userRequest.getEmail());
+
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUserLevelId(userRequest.getUserLevelId());
+
+        if(userRequest.getPassword() != null && !userRequest.getPassword().isBlank()){
+
+            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+        }
+
+        return user;
 
     }
 
