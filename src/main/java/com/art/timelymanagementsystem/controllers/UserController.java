@@ -1,5 +1,6 @@
 package com.art.timelymanagementsystem.controllers;
 
+import com.art.timelymanagementsystem.dto.ErrorResponseDto;
 import com.art.timelymanagementsystem.dto.UserDto;
 import com.art.timelymanagementsystem.dto.UserWithTimeLogsDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -98,6 +100,23 @@ public class UserController {
         }
 
         return userService.updateUser(user, userRequest);
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> DeleteUser(@PathVariable Long id){
+
+        User user = userRepository.findById(id).orElse(null);
+
+        if(user == null){
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, "User Not Found"));
+
+        }
+
+        userRepository.delete(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body("User Successfully Deleted");
 
     }
 

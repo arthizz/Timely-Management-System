@@ -36,7 +36,6 @@ public class UserProfileService {
         newUser.setUserProfile(newUserProfile);
 
         User createdUser = userRepository.save(newUser);
-        UserProfile createdUserProfile = userProfileRepository.save(newUserProfile);
 
 
         return userMapper.toDto(createdUser);
@@ -50,7 +49,6 @@ public class UserProfileService {
         userProfile = this.setUserProfileData(userProfile, userRequest);
 
         User updatedUser = userRepository.save(user);
-        UserProfile updatedUserProfile = userProfileRepository.save(userProfile);
 
         return ResponseEntity.ok(userMapper.toDto(updatedUser));
 
