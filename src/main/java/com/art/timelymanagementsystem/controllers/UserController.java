@@ -2,22 +2,19 @@ package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.ErrorResponseDto;
 import com.art.timelymanagementsystem.dto.UserDto;
-import com.art.timelymanagementsystem.dto.UserWithTimeLogsDto;
-import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.entities.User;
-import com.art.timelymanagementsystem.entities.UserProfile;
+import com.art.timelymanagementsystem.exceptions.UserNotFoundException;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.UserProfileRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
+import com.art.timelymanagementsystem.request.UpdateUserRequest;
 import com.art.timelymanagementsystem.request.UserRequest;
 import com.art.timelymanagementsystem.services.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,20 +43,14 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id){
 
-        var user = userRepository.findById(id).map(userMapper::toDto).orElse(null);
-
-        if(user == null){
-
-            return ResponseEntity.notFound().build();
-
-        }
+        var user = userRepository.findById(id).map(userMapper::toDto).orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
         return ResponseEntity.ok(user);
 
     }
 
     @PostMapping
-    public UserDto createNewUser(@RequestBody UserRequest request){
+    public UserDto createNewUser(@Valid @RequestBody UserRequest request){
 //        For Later
 //        var user = userMapper.toEntity(request);
 //        System.out.println(user);
@@ -89,7 +80,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest){
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UserRequest userRequest){
 
         var user = userRepository.findById(id).orElse(null);
 
