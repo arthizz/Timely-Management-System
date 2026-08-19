@@ -26,6 +26,13 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(CompanyNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleCompanyNotFoundException(CompanyNotFoundException e){
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
+
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception e) {
 

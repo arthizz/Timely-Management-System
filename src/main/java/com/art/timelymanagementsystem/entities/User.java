@@ -42,4 +42,11 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<TimeLog> timeLogs;
 
+    @PrePersist
+    public void prePersist(){
+
+        createdAt = LocalDateTime.now();
+
+    }
+
 }

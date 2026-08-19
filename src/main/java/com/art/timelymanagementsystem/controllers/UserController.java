@@ -82,13 +82,8 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UserRequest userRequest){
 
-        var user = userRepository.findById(id).orElse(null);
+        var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
-        if(user == null){
-
-            return ResponseEntity.notFound().build();
-
-        }
 
         return userService.updateUser(user, userRequest);
 
@@ -97,13 +92,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> DeleteUser(@PathVariable Long id){
 
-        User user = userRepository.findById(id).orElse(null);
-
-        if(user == null){
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, "User Not Found"));
-
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         userRepository.delete(user);
 
