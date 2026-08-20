@@ -28,10 +28,10 @@ public class Company {
     private String companyAdminEmail;
 
     @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified;
+    private Boolean isVerified = false;
 
     @Column(name = "is_subscribed", nullable = false)
-    private Boolean isSubscribed;
+    private Boolean isSubscribed = false;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

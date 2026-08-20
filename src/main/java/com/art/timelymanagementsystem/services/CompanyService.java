@@ -33,8 +33,6 @@ public class CompanyService {
         company.setCompanyAddress(companyRequest.getCompanyAddress());
         company.setCompanyName(companyRequest.getCompanyName());
         company.setCompanyAdminEmail(companyRequest.getCompanyAdminEmail());
-        company.setIsSubscribed(companyRequest.getIsSubscribed());
-        company.setIsVerified(companyRequest.getIsVerified());
 
         companyRepository.save(company);
 

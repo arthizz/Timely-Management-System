@@ -7,6 +7,7 @@ import com.art.timelymanagementsystem.mappers.CompanyMapper;
 import com.art.timelymanagementsystem.repositories.CompanyRepository;
 import com.art.timelymanagementsystem.request.CompanyRequest;
 import com.art.timelymanagementsystem.services.CompanyService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,14 +44,14 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<CompanyDto> createCompany(@RequestBody CompanyRequest companyRequest){
+    public ResponseEntity<CompanyDto> createCompany(@Valid @RequestBody CompanyRequest companyRequest){
 
         return companyService.createCompanyService(companyRequest);
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CompanyDto> updateCompany(@PathVariable Long id, @RequestBody CompanyRequest companyRequest){
+    public ResponseEntity<CompanyDto> updateCompany(@PathVariable Long id, @Valid @RequestBody CompanyRequest companyRequest){
 
         Company company = companyRepository.findById(id).orElseThrow(() -> new CompanyNotFoundException("Unable to update company, company does not exists"));
 
