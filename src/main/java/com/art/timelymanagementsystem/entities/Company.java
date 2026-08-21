@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @ToString
@@ -35,6 +36,12 @@ public class Company {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    private List<CompanyRole> companyRoles;
+
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    private List<User> users;
 
     @PrePersist
     public void prePersist(){

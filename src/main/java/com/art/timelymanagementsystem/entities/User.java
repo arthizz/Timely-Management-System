@@ -33,13 +33,21 @@ public class User {
     @Column(name = "user_level_id", nullable = false)
     private Short userLevelId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = true)
+    private CompanyRole role;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = true)
+    private Company company;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UserProfile userProfile;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TimeLog> timeLogs;
 
     @PrePersist
