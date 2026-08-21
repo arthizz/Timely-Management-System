@@ -38,8 +38,9 @@ public class UserRequest {
     @NotBlank(message = "Address Required")
     private String address;
 
-    @NotBlank(message = "Company Role Required")
     private Long roleId;
+
+    private Long companyId;
 
     private String profilePicture;
 
