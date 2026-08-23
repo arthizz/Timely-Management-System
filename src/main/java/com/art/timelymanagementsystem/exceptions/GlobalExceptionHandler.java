@@ -1,6 +1,7 @@
 package com.art.timelymanagementsystem.exceptions;
 
 import com.art.timelymanagementsystem.dto.ErrorResponseDto;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CompanyNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleCompanyNotFoundException(CompanyNotFoundException e){
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
+
+    }
+
+    @ExceptionHandler(CompanyRoleNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleCompanyRoleNotFoundException(CompanyRoleNotFoundException e){
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
+
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(ResourceNotFoundException e){
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
 

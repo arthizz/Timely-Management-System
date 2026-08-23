@@ -67,7 +67,7 @@ public class CompanyController {
 
         companyRepository.delete(company);
 
-        return ResponseEntity.status(HttpStatus.OK).body("User Deleted Success!");
+        return ResponseEntity.status(HttpStatus.OK).body("Company Deleted Success!");
 
     }
 
