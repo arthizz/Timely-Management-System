@@ -6,6 +6,8 @@ import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.CompanyRoleMapper;
 import com.art.timelymanagementsystem.repositories.CompanyRoleRepository;
 import com.art.timelymanagementsystem.request.CompanyRoleRequest;
+import com.art.timelymanagementsystem.services.CompanyRoleService;
+import com.art.timelymanagementsystem.services.CompanyService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ public class CompanyRoleController {
 
     private final CompanyRoleRepository companyRoleRepository;
     private final CompanyRoleMapper companyRoleMapper;
+    private final CompanyRoleService companyRoleService;
 
     @GetMapping
     public ResponseEntity<List<CompanyRoleDto>> getCompanyRoles(){
@@ -39,11 +42,11 @@ public class CompanyRoleController {
 
     }
 
-//    @PostMapping
-//    public ResponseEntity<CompanyRoleDto> createCompanyRole(@Valid @RequestBody CompanyRoleRequest companyRoleRequest){
-//
-//
-//
-//    }
+    @PostMapping
+    public ResponseEntity<CompanyRoleDto> createCompanyRole(@Valid @RequestBody CompanyRoleRequest companyRoleRequest){
+
+        return companyRoleService.createNewRoleService(companyRoleRequest);
+
+    }
 
 }

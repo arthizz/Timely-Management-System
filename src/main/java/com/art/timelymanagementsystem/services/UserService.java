@@ -7,6 +7,7 @@ import com.art.timelymanagementsystem.entities.User;
 import com.art.timelymanagementsystem.entities.UserProfile;
 import com.art.timelymanagementsystem.exceptions.CompanyNotFoundException;
 import com.art.timelymanagementsystem.exceptions.CompanyRoleNotFoundException;
+import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.CompanyRepository;
 import com.art.timelymanagementsystem.repositories.CompanyRoleRepository;
@@ -49,8 +50,14 @@ public class UserService {
 
     public User setUserData(User user, UserRequest userRequest){
 
-        CompanyRole companyRole = companyRoleRepository.findById(userRequest.getRoleId()).orElseThrow(() -> new CompanyRoleNotFoundException("Company Role Not Found"));
-        Company company = companyRepository.findById(userRequest.getCompanyId()).orElseThrow(() -> new CompanyNotFoundException("Company Not Found"));
+        CompanyRole companyRole = companyRoleRepository.findById(userRequest.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Company Role Not Found"));
+        Company company = companyRepository.findById(userRequest.getCompanyId()).orElseThrow(() -> new ResourceNotFoundException("Company Not Found"));
+
+        if(companyRole.getCompany() != company){
+
+            throw new ResourceNotFoundException("Role does not belong to the selected company");
+
+        }
 
         user.setUserName(userRequest.getUserName());
         user.setEmail(userRequest.getEmail());
