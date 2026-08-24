@@ -5,6 +5,7 @@ import com.art.timelymanagementsystem.entities.Company;
 import com.art.timelymanagementsystem.entities.CompanyRole;
 import com.art.timelymanagementsystem.entities.User;
 import com.art.timelymanagementsystem.entities.UserProfile;
+import com.art.timelymanagementsystem.exceptions.BadRequestException;
 import com.art.timelymanagementsystem.exceptions.CompanyNotFoundException;
 import com.art.timelymanagementsystem.exceptions.CompanyRoleNotFoundException;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
@@ -13,6 +14,8 @@ import com.art.timelymanagementsystem.repositories.CompanyRepository;
 import com.art.timelymanagementsystem.repositories.CompanyRoleRepository;
 import com.art.timelymanagementsystem.repositories.UserLevelRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
+import com.art.timelymanagementsystem.request.CreateUserRequest;
+import com.art.timelymanagementsystem.request.UpdateUserRequest;
 import com.art.timelymanagementsystem.request.UserRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,46 +33,70 @@ public class UserService {
     private final CompanyRoleRepository companyRoleRepository;
     private final CompanyRepository companyRepository;
 
-    public UserDto createUser(UserRequest userRequest){
+    public UserDto createUser(CreateUserRequest request){
 
         var newUser = new User();
 
-        newUser = this.setUserData(newUser, userRequest);
+        newUser = this.setUserData(newUser, request);
 
-        return userProfileService.CreateUserProfile(userRequest, newUser);
+        if(request.getPassword() != null && !request.getPassword().isBlank()){
+
+            newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        }
+
+        newUser = this.setCompanyAndRole(newUser, request);
+        return userProfileService.CreateUserProfile(request, newUser);
 
     }
 
-    public ResponseEntity<UserDto> updateUser(User user, UserRequest userRequest){
+    public ResponseEntity<UserDto> updateUser(User user, UpdateUserRequest request){
 
-        user = this.setUserData(user, userRequest);
+        user = this.setUserData(user, request);
 
-        return userProfileService.updateUserProfile(user, userRequest);
+        if(request.getCompanyId() != null || request.getRoleId() != null){
+
+            user = this.setCompanyAndRole(user, request);
+
+        }
+
+        return userProfileService.updateUserProfile(user, request);
 
     }
 
     public User setUserData(User user, UserRequest userRequest){
 
-        CompanyRole companyRole = companyRoleRepository.findById(userRequest.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Company Role Not Found"));
-        Company company = companyRepository.findById(userRequest.getCompanyId()).orElseThrow(() -> new ResourceNotFoundException("Company Not Found"));
-
-        if(companyRole.getCompany() != company){
-
-            throw new ResourceNotFoundException("Role does not belong to the selected company");
-
-        }
 
         user.setUserName(userRequest.getUserName());
         user.setEmail(userRequest.getEmail());
-
         user.setCreatedAt(LocalDateTime.now());
         user.setUserLevelId(userRequest.getUserLevelId());
-        user.setRole(companyRole);
-        user.setCompany(company);
 
-        if(userRequest.getPassword() != null && !userRequest.getPassword().isBlank()){
+        return user;
 
-            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+    }
+
+    public User setCompanyAndRole(User user, UserRequest userRequest){
+
+        if((userRequest.getRoleId() != null) ^ (userRequest.getCompanyId() != null)){
+
+            throw new BadRequestException("Company and Employee role must be provided together");
+
+        }
+
+        if(userRequest.getRoleId() != null){
+
+            CompanyRole companyRole = companyRoleRepository.findById(userRequest.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Company Role Not Found"));
+            Company company = companyRepository.findById(userRequest.getCompanyId()).orElseThrow(() -> new ResourceNotFoundException("Company Not Found"));
+
+            if(!companyRole.getCompany().getId().equals(company.getId())){
+
+                throw new BadRequestException("Role does not belong to the selected company");
+
+            }
+
+            user.setRole(companyRole);
+            user.setCompany(company);
 
         }
 

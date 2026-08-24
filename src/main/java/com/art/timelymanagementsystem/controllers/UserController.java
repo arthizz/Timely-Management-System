@@ -7,6 +7,7 @@ import com.art.timelymanagementsystem.exceptions.UserNotFoundException;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.UserProfileRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
+import com.art.timelymanagementsystem.request.CreateUserRequest;
 import com.art.timelymanagementsystem.request.UpdateUserRequest;
 import com.art.timelymanagementsystem.request.UserRequest;
 import com.art.timelymanagementsystem.services.UserService;
@@ -50,7 +51,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createNewUser(@Valid @RequestBody UserRequest request){
+    public UserDto createNewUser(@Valid @RequestBody CreateUserRequest request){
 //        For Later
 //        var user = userMapper.toEntity(request);
 //        System.out.println(user);
@@ -80,12 +81,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UserRequest userRequest){
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest request){
 
         var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
 
-        return userService.updateUser(user, userRequest);
+        return userService.updateUser(user, request);
 
     }
 

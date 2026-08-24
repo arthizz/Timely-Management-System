@@ -20,10 +20,6 @@ public class UserRequest {
     @NotBlank(message = "Email Required")
     private String email;
 
-    @NotBlank(message = "Password Required")
-    @Size(min = 8, message = "Password should be minimum of 8 characters")
-    private String password;
-
     @NotNull(message = "User Level Required")
     private Short userLevelId;
 
