@@ -1,15 +1,13 @@
 package com.art.timelymanagementsystem.controllers;
 
-import com.art.timelymanagementsystem.dto.ErrorResponseDto;
 import com.art.timelymanagementsystem.dto.UserDto;
 import com.art.timelymanagementsystem.entities.User;
-import com.art.timelymanagementsystem.exceptions.UserNotFoundException;
+import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.UserProfileRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
 import com.art.timelymanagementsystem.request.CreateUserRequest;
 import com.art.timelymanagementsystem.request.UpdateUserRequest;
-import com.art.timelymanagementsystem.request.UserRequest;
 import com.art.timelymanagementsystem.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -44,7 +42,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id){
 
-        var user = userRepository.findById(id).map(userMapper::toDto).orElseThrow(() -> new UserNotFoundException("User Not Found"));
+        var user = userRepository.findById(id).map(userMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
         return ResponseEntity.ok(user);
 
@@ -83,7 +81,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest request){
 
-        var user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User Not Found"));
+        var user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
 
         return userService.updateUser(user, request);
@@ -93,7 +91,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> DeleteUser(@PathVariable Long id){
 
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         userRepository.delete(user);
 

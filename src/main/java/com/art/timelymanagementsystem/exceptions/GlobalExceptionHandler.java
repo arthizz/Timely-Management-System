@@ -11,12 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleUserNotFound( UserNotFoundException e ){
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
-
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationException( MethodArgumentNotValidException e ){
@@ -24,20 +18,6 @@ public class GlobalExceptionHandler {
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
 
         return ResponseEntity.badRequest().body(new ErrorResponseDto(400, message));
-
-    }
-
-    @ExceptionHandler(CompanyNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleCompanyNotFoundException(CompanyNotFoundException e){
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
-
-    }
-
-    @ExceptionHandler(CompanyRoleNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleCompanyRoleNotFoundException(CompanyRoleNotFoundException e){
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(404, e.getMessage()));
 
     }
 
