@@ -22,7 +22,7 @@ public class TimeLogDto {
     private LocalDateTime timeOut;
     private Boolean inNightShift;
     private LocalDateTime CreatedAt;
-    private List<TimeLogPauseDto> timeLogPause;
+//    private List<TimeLogPauseDto> timeLogPause;
 
 
 }
