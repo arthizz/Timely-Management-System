@@ -1,5 +1,6 @@
 package com.art.timelymanagementsystem.controllers;
 
+import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
@@ -56,13 +57,13 @@ public class TimeLogController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTimeLog(@PathVariable Long id){
+    public ResponseEntity<MessageResponseDto> deleteTimeLog(@PathVariable Long id){
 
         TimeLog timeLog = timeLogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TimeLog not Found"));
 
         timeLogRepository.delete(timeLog);
 
-        return ResponseEntity.ok("Delete TimeLog Success");
+        return ResponseEntity.ok(new MessageResponseDto("Delete Time Log Success"));
 
     }
 

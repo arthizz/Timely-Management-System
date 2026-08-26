@@ -11,10 +11,6 @@ public class TimeLogRequest {
     @NotNull(message = "User should login first to use timelogger")
     private Long userId;
 
-
-    private LocalDateTime timeIn;
-    private LocalDateTime timeOut;
-
     private Boolean isTimingOut;
     private Boolean isTimingIn;
 
