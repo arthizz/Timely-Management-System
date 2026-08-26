@@ -14,6 +14,10 @@ public class TimeLogRequest {
 
     private LocalDateTime timeIn;
     private LocalDateTime timeOut;
+
+    private Boolean isTimingOut;
+    private Boolean isTimingIn;
+
     private Boolean inNightShift;
 
 }

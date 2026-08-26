@@ -1,6 +1,7 @@
 package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.TimeLogDto;
+import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.TimeLogMapper;
 import com.art.timelymanagementsystem.repositories.TimeLogRepository;
@@ -44,6 +45,24 @@ public class TimeLogController {
     public ResponseEntity<TimeLogDto> createTimeLog(@Valid @RequestBody TimeLogRequest timeLogRequest){
 
         return timeLogService.createTimeLogService(timeLogRequest);
+
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TimeLogDto> updateTimeLog(@PathVariable Long id, @Valid @RequestBody TimeLogRequest timeLogRequest){
+
+        return timeLogService.updateTimeLogService(timeLogRequest, id);
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTimeLog(@PathVariable Long id){
+
+        TimeLog timeLog = timeLogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TimeLog not Found"));
+
+        timeLogRepository.delete(timeLog);
+
+        return ResponseEntity.ok("Delete TimeLog Success");
 
     }
 

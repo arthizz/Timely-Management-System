@@ -42,4 +42,22 @@ public class TimeLogService {
 
     }
 
+    public ResponseEntity<TimeLogDto> updateTimeLogService(TimeLogRequest timeLogRequest, Long timeLogId){
+
+        TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("TimeLog Does not Exists"));
+
+        if(timeLogRequest.getIsTimingIn()){
+
+            timeLog.setTimeOut(null);
+
+            return ResponseEntity.ok(timeLogMapper.toDto(timeLog));
+
+        }
+
+        timeLog.setTimeOut(LocalDateTime.now());
+
+        return ResponseEntity.ok(timeLogMapper.toDto(timeLog));
+
+    }
+
 }
