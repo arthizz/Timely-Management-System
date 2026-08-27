@@ -1,5 +1,6 @@
 package com.art.timelymanagementsystem.services;
 
+import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.entities.User;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,18 @@ public class TimeLogService {
     private final TimeLogRepository timeLogRepository;
     private final TimeLogMapper timeLogMapper;
     private final UserRepository userRepository;
+
+    public List<TimeLogDto> getAllTimeLogService(){
+
+        return timeLogRepository.findAll().stream().map(timeLogMapper::toDto).toList();
+
+    }
+
+    public TimeLogDto getSingleTimeLogService(Long id){
+
+        return timeLogRepository.findById(id).map(timeLogMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("TimeLog Not Found"));
+
+    }
 
     public ResponseEntity<TimeLogDto> createTimeLogService(TimeLogRequest timeLogRequest){
 
@@ -41,12 +55,8 @@ public class TimeLogService {
         timeLog.setUser(user);
         timeLog.setTimeIn(LocalDateTime.now());
         timeLog.setTimeOut(null);
+        timeLog.setIsNightShift(Boolean.TRUE.equals(timeLogRequest.getInNightShift()));
 
-        if(timeLogRequest.getInNightShift() == null){
-
-            timeLog.setIsNightShift(false);
-
-        }
         timeLog.setCreatedAt(LocalDateTime.now());
 
         timeLogRepository.save(timeLog);
@@ -55,29 +65,13 @@ public class TimeLogService {
 
     }
 
-    public ResponseEntity<TimeLogDto> updateTimeLogService(TimeLogRequest timeLogRequest, Long timeLogId){
+    public ResponseEntity<TimeLogDto> updateTimeLogService(Long timeLogId){
 
         TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("TimeLog Does not Exists"));
 
-        if(timeLog.getTimeOut() == null && timeLogRequest.getIsTimingIn() == true){
+        if(timeLog.getTimeOut() != null){
 
-            throw new BadRequestException("User is currently timed in, Request should be timeOut");
-
-        }
-
-        System.out.println(timeLog.getTimeOut());
-
-        if(timeLog.getTimeOut() != null && timeLogRequest.getIsTimingOut() == true){
-
-            throw new BadRequestException("User is currently Timed out, Request should be time in");
-
-        }
-
-        if(timeLogRequest.getIsTimingIn() || timeLogRequest.getIsTimingIn() == null){
-
-            timeLog.setTimeOut(null);
-            timeLogRepository.save(timeLog);
-            return ResponseEntity.ok(timeLogMapper.toDto(timeLog));
+            throw new BadRequestException("User already timedOut, if you need to adjust please request it to the manager");
 
         }
 
@@ -86,6 +80,16 @@ public class TimeLogService {
         timeLogRepository.save(timeLog);
 
         return ResponseEntity.ok(timeLogMapper.toDto(timeLog));
+
+    }
+
+    public MessageResponseDto deleteTimeLogService(Long id){
+
+        TimeLog timeLog = timeLogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TimeLog not Found"));
+
+        timeLogRepository.delete(timeLog);
+
+        return new MessageResponseDto("Delete Time Log Success");
 
     }
 

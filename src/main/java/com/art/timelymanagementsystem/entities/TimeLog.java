@@ -6,8 +6,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @ToString
@@ -27,7 +25,7 @@ public class TimeLog {
     @Column(name = "time_in", nullable = false)
     private LocalDateTime timeIn;
 
-    @Column(name = "time_out", nullable = false)
+    @Column(name = "time_out")
     private LocalDateTime timeOut;
 
     @Column(name = "is_night_shift", nullable = false)
@@ -36,7 +34,11 @@ public class TimeLog {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "timeLogId", fetch = FetchType.LAZY)
-    private List<TimeLogPause> timeLogPause;
+    @PrePersist
+    public void onCreate(){
+
+        createdAt = LocalDateTime.now();
+
+    }
 
 }

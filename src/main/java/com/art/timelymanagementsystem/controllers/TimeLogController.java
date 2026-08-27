@@ -2,10 +2,6 @@ package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
-import com.art.timelymanagementsystem.entities.TimeLog;
-import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
-import com.art.timelymanagementsystem.mappers.TimeLogMapper;
-import com.art.timelymanagementsystem.repositories.TimeLogRepository;
 import com.art.timelymanagementsystem.request.TimeLogRequest;
 import com.art.timelymanagementsystem.services.TimeLogService;
 import jakarta.validation.Valid;
@@ -20,25 +16,19 @@ import java.util.List;
 @RequestMapping("/api/timelog")
 public class TimeLogController {
 
-    private final TimeLogRepository timeLogRepository;
-    private final TimeLogMapper timeLogMapper;
     private final TimeLogService timeLogService;
 
     @GetMapping
     public ResponseEntity<List<TimeLogDto>> getAllTimeLog(){
 
-        List<TimeLogDto> timeLogDto = timeLogRepository.findAll().stream().map(timeLogMapper::toDto).toList();
-
-        return ResponseEntity.ok(timeLogDto);
+        return ResponseEntity.ok(timeLogService.getAllTimeLogService());
 
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeLogDto> getSingleTimeLog(@PathVariable Long id){
 
-        TimeLogDto timeLogDto = timeLogRepository.findById(id).map(timeLogMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("TimeLog Not Found"));
-
-        return ResponseEntity.ok(timeLogDto);
+        return ResponseEntity.ok(timeLogService.getSingleTimeLogService(id));
 
     }
 
@@ -50,20 +40,16 @@ public class TimeLogController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TimeLogDto> updateTimeLog(@PathVariable Long id, @Valid @RequestBody TimeLogRequest timeLogRequest){
+    public ResponseEntity<TimeLogDto> updateTimeLog(@PathVariable Long id){
 
-        return timeLogService.updateTimeLogService(timeLogRequest, id);
+        return timeLogService.updateTimeLogService(id);
 
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDto> deleteTimeLog(@PathVariable Long id){
 
-        TimeLog timeLog = timeLogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TimeLog not Found"));
-
-        timeLogRepository.delete(timeLog);
-
-        return ResponseEntity.ok(new MessageResponseDto("Delete Time Log Success"));
+        return ResponseEntity.ok(timeLogService.deleteTimeLogService(id));
 
     }
 

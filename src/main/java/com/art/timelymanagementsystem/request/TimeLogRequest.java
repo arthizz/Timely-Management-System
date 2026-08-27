@@ -8,11 +8,8 @@ import java.time.LocalDateTime;
 @Data
 public class TimeLogRequest {
 
-    @NotNull(message = "User should login first to use timelogger")
+    @NotNull(message = "User should login first to use time log")
     private Long userId;
-
-    private Boolean isTimingOut;
-    private Boolean isTimingIn;
 
     private Boolean inNightShift;
 
