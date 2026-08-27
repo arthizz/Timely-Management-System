@@ -2,6 +2,7 @@ package com.art.timelymanagementsystem.services;
 
 import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
+import com.art.timelymanagementsystem.dto.TotalWorkHoursDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
 import com.art.timelymanagementsystem.entities.User;
 import com.art.timelymanagementsystem.exceptions.BadRequestException;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -90,6 +92,39 @@ public class TimeLogService {
         timeLogRepository.delete(timeLog);
 
         return new MessageResponseDto("Delete Time Log Success");
+
+    }
+
+    public TotalWorkHoursDto getTotalHoursService(Long id){
+
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not Found"));
+
+        TimeLog timeLogToday = timeLogRepository.findTimeLogOfToday(
+                user.getId(),
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().plusDays(1).atStartOfDay()
+        ).orElseThrow(() -> new ResourceNotFoundException("User does not have a Log yet"));
+
+        if(timeLogToday.getTimeOut() == null){
+
+            throw new BadRequestException("User has not time out yet");
+
+        }
+
+        var timeLogIn = timeLogToday.getTimeIn();
+        var timeLogOut = timeLogToday.getTimeOut();
+
+        Duration duration = Duration.between(timeLogIn, timeLogOut);
+
+        return new TotalWorkHoursDto(duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+
+    }
+
+    public List<TimeLogDto> getUserTimeLogsService(Long id){
+
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+        return timeLogRepository.findByUserId(id).stream().map(timeLogMapper::toDto).toList();
 
     }
 
