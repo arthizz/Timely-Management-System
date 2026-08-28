@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TimeLog> timeLogs;
+
+    @Column(name = "hourly_rate", nullable = false, precision = 10, scale = 2)
+    private BigDecimal hourlyRate;
 
     @PrePersist
     public void prePersist(){

@@ -110,8 +110,13 @@ public class UserService {
 
         user.setUserName(userRequest.getUserName());
         user.setEmail(userRequest.getEmail());
-        user.setCreatedAt(LocalDateTime.now());
         user.setUserLevelId(userRequest.getUserLevelId());
+
+        if(userRequest.getHourlyRate() != null){
+
+            user.setHourlyRate(userRequest.getHourlyRate());
+
+        }
 
         return user;
 

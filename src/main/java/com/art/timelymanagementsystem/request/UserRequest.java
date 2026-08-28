@@ -1,12 +1,10 @@
 package com.art.timelymanagementsystem.request;
 
 import com.art.timelymanagementsystem.entities.User;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -33,6 +31,9 @@ public class UserRequest {
 
     @NotBlank(message = "Address Required")
     private String address;
+
+    @DecimalMin(value = "0.00", message = "Hourly Rate cannot be negative or lower than zero")
+    private BigDecimal hourlyRate;
 
     private Long roleId;
 

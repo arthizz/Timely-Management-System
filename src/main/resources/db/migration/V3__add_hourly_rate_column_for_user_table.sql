@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD COLUMN hourly_rate DECIMAL(20, 2) NOT NULL DEFAULT 0.00
