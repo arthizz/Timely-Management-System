@@ -1,5 +1,6 @@
 package com.art.timelymanagementsystem.controllers;
 
+import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.UserDto;
 import com.art.timelymanagementsystem.entities.User;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
@@ -30,11 +31,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers(@RequestParam(required = false, defaultValue = "id") String sort){
 
-        var userList =  userRepository.findAll(Sort.by(sort))
-                .stream().map(userMapper::toDto)
-                .toList();
-
-        return ResponseEntity.ok(userList);
+        return ResponseEntity.ok(userService.getAllUsersService());
 
     }
 
@@ -42,17 +39,12 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id){
 
-        var user = userRepository.findById(id).map(userMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
-
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getSingleUserService(id));
 
     }
 
     @PostMapping
     public UserDto createNewUser(@Valid @RequestBody CreateUserRequest request){
-//        For Later
-//        var user = userMapper.toEntity(request);
-//        System.out.println(user);
 
         return userService.createUser(request);
 
@@ -62,40 +54,21 @@ public class UserController {
     @GetMapping("/userlevelid")
     public ResponseEntity<List<UserDto>> findUserByLevel(@RequestParam(required = false, name="userLevelId") Byte userLevelId){
 
-        List<User> users;
-        System.out.println("this is test");
-        if(userLevelId != null){
-
-            users = userRepository.findByUserLevelId(userLevelId);
-
-        }else{
-
-            users = userRepository.findAll();
-
-        }
-
-        return ResponseEntity.ok(users.stream().map(userMapper::toDto).toList());
+        return ResponseEntity.ok(userService.findByUserLevelService(userLevelId));
 
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest request){
 
-        var user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
-
-
-        return userService.updateUser(user, request);
+        return userService.updateUser(id, request);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> DeleteUser(@PathVariable Long id){
+    public ResponseEntity<MessageResponseDto> DeleteUser(@PathVariable Long id){
 
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        userRepository.delete(user);
-
-        return ResponseEntity.status(HttpStatus.OK).body("User Successfully Deleted");
+        return ResponseEntity.ok(userService.deleteUserService(id));
 
     }
 
