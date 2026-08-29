@@ -107,6 +107,11 @@ public class UserService {
 
     public User setUserData(User user, UserRequest userRequest){
 
+        if(userRepository.existsByEmail(userRequest.getEmail())){
+
+            throw new BadRequestException("Email already exists");
+
+        }
 
         user.setUserName(userRequest.getUserName());
         user.setEmail(userRequest.getEmail());
