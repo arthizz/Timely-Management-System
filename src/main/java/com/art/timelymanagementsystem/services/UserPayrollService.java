@@ -11,7 +11,11 @@ import com.art.timelymanagementsystem.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,17 +28,40 @@ public class UserPayrollService {
     private final TimeLogMapper timeLogMapper;
 
 
-    public UserPayrollDto getAllUserPayrollService(Long userId){
+    public UserPayrollDto getUserPayrollService(Long userId, LocalDate startDate, LocalDate endDate){
 
         UserDto userDto = userRepository.findById(userId).map(userMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
-        List<TimeLogDto> timeLogDto = timeLogRepository.findByUserId(userId).stream().map(timeLogMapper::toDto).toList();
+        LocalDateTime payrollStartDate = startDate.atStartOfDay();
+        LocalDateTime payrollEndDate = endDate.plusDays(1).atStartOfDay();
 
+        List<TimeLogDto> timeLogDtos = timeLogRepository.findUserTimeLogByDateRange(userId, payrollStartDate, payrollEndDate).stream().map(timeLogMapper::toDto).toList();
 
+        Duration totalDuration = Duration.ZERO;
+
+        for (TimeLogDto timeLogDto : timeLogDtos){
+
+            if(timeLogDto.getTimeOut() == null){
+
+                continue;
+
+            }
+
+            Duration duration = Duration.between(timeLogDto.getTimeIn(), timeLogDto.getTimeOut());
+
+            totalDuration = totalDuration.plus(duration);
+
+        }
+
+        return this.setUserPayRollData(userDto, startDate, endDate, totalDuration);
 
     }
 
-    public UserPayrollDto setUserPayRollData(TimeLogDto timeLogDto, UserDto userDto, LocalDate startDate, LocalDate endDate){
+    public UserPayrollDto setUserPayRollData(UserDto userDto, LocalDate startDate, LocalDate endDate, Duration totalDuration){
+
+        BigDecimal totalHoursWork = BigDecimal.valueOf(totalDuration.toSeconds()).divide(BigDecimal.valueOf(3600), 2, RoundingMode.HALF_UP);
+
+        BigDecimal totalPay = userDto.getHourlyRate().multiply(totalHoursWork);
 
         UserPayrollDto userPayrollDto = new UserPayrollDto();
 
@@ -42,6 +69,8 @@ public class UserPayrollService {
         userPayrollDto.setStartDate(startDate);
         userPayrollDto.setEndDate(endDate);
         userPayrollDto.setHourlyRate(userDto.getHourlyRate());
+        userPayrollDto.setTotalPay(totalPay);
+        userPayrollDto.setTotalHours(totalHoursWork);
 
         return userPayrollDto;
 

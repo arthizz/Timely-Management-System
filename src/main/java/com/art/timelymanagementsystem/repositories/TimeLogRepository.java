@@ -1,7 +1,6 @@
 package com.art.timelymanagementsystem.repositories;
 
 import com.art.timelymanagementsystem.entities.TimeLog;
-import com.art.timelymanagementsystem.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,5 +22,21 @@ public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
             AND t.timeIn >= :startOfDay
             AND t.timeIn < :startOfNextDay
     """)
-    Optional<TimeLog> findTimeLogOfToday(@Param("userId") Long userId, @Param("startOfDay")LocalDateTime startOfDay, @Param("startOfNextDay") LocalDateTime startOfNextDay);
+    Optional<TimeLog> findTimeLogOfToday(
+            @Param("userId") Long userId,
+            @Param("startOfDay")LocalDateTime startOfDay,
+            @Param("startOfNextDay") LocalDateTime startOfNextDay);
+
+    @Query("""
+        SELECT t
+        FROM TimeLog t
+        WHERE t.user.id = :userId
+            AND t.createdAt >= :startDate
+            AND t.createdAt < :endDate
+    """)
+    List<TimeLog> findUserTimeLogByDateRange(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+            );
 }
