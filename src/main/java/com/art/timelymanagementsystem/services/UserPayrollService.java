@@ -3,6 +3,7 @@ package com.art.timelymanagementsystem.services;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
 import com.art.timelymanagementsystem.dto.UserDto;
 import com.art.timelymanagementsystem.dto.UserPayrollDto;
+import com.art.timelymanagementsystem.exceptions.BadRequestException;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.TimeLogMapper;
 import com.art.timelymanagementsystem.mappers.UserMapper;
@@ -37,13 +38,25 @@ public class UserPayrollService {
 
         List<TimeLogDto> timeLogDtos = timeLogRepository.findUserTimeLogByDateRange(userId, payrollStartDate, payrollEndDate).stream().map(timeLogMapper::toDto).toList();
 
+        if(userDto.getHourlyRate().compareTo(BigDecimal.ZERO) <= 0){
+
+            throw new BadRequestException("User currently does not have an hourly rate, please set it up first");
+
+        }
+
+        if(timeLogDtos.isEmpty()){
+
+            throw new ResourceNotFoundException("User does not have any time logs for the selected date range");
+
+        }
+
         Duration totalDuration = Duration.ZERO;
 
         for (TimeLogDto timeLogDto : timeLogDtos){
 
             if(timeLogDto.getTimeOut() == null){
 
-                continue;
+                throw new BadRequestException("User have a incomplete time logs please fix it first to calculate the work hours");
 
             }
 
@@ -61,7 +74,7 @@ public class UserPayrollService {
 
         BigDecimal totalHoursWork = BigDecimal.valueOf(totalDuration.toSeconds()).divide(BigDecimal.valueOf(3600), 2, RoundingMode.HALF_UP);
 
-        BigDecimal totalPay = userDto.getHourlyRate().multiply(totalHoursWork);
+        BigDecimal totalPay = userDto.getHourlyRate().multiply(totalHoursWork).setScale(2, RoundingMode.HALF_UP);
 
         UserPayrollDto userPayrollDto = new UserPayrollDto();
 

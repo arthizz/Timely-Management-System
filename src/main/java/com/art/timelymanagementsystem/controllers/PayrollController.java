@@ -1,6 +1,7 @@
 package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.UserPayrollDto;
+import com.art.timelymanagementsystem.exceptions.BadRequestException;
 import com.art.timelymanagementsystem.request.PayrollRequest;
 import com.art.timelymanagementsystem.services.UserPayrollService;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,12 @@ public class PayrollController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserPayrollDto> getUserPayroll(@PathVariable Long userId, @RequestParam LocalDate startDate, @RequestParam LocalDate endDate){
+
+        if(startDate.isAfter(endDate)){
+
+            throw new BadRequestException("Start date cannot be after end date");
+
+        }
 
         return ResponseEntity.ok(userPayrollService.getUserPayrollService(userId, startDate, endDate));
 
