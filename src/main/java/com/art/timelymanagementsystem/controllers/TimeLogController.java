@@ -2,6 +2,7 @@ package com.art.timelymanagementsystem.controllers;
 
 import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
+import com.art.timelymanagementsystem.dto.TimeLogPauseDto;
 import com.art.timelymanagementsystem.dto.TotalWorkHoursDto;
 import com.art.timelymanagementsystem.request.TimeLogRequest;
 import com.art.timelymanagementsystem.services.TimeLogService;
@@ -66,6 +67,13 @@ public class TimeLogController {
     public ResponseEntity<List<TimeLogDto>> getUserTimeLogs(@PathVariable Long userId){
 
         return ResponseEntity.ok(timeLogService.getUserTimeLogsService(userId));
+
+    }
+
+    @PostMapping("/pause/{timeLogId}")
+    public ResponseEntity<TimeLogPauseDto> pauseCurrentTimeLog(@PathVariable Long timeLogId){
+
+        return ResponseEntity.ok(timeLogService.pauseCurrentTimeLogService(timeLogId));
 
     }
 

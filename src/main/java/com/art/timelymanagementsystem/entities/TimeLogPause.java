@@ -22,10 +22,20 @@ public class TimeLogPause {
     @JoinColumn(name = "time_log_id", nullable = false)
     private TimeLog timeLogId;
 
+    @Column(name = "time_pause", nullable = true)
+    private LocalDateTime timePause;
+
     @Column(name = "time_resume", nullable = false)
     private LocalDateTime timeResume;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    private void onCreate(){
+
+        createdAt = LocalDateTime.now();
+
+    }
 
 }

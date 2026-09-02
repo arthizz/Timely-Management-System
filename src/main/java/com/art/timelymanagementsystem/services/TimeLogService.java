@@ -2,12 +2,16 @@ package com.art.timelymanagementsystem.services;
 
 import com.art.timelymanagementsystem.dto.MessageResponseDto;
 import com.art.timelymanagementsystem.dto.TimeLogDto;
+import com.art.timelymanagementsystem.dto.TimeLogPauseDto;
 import com.art.timelymanagementsystem.dto.TotalWorkHoursDto;
 import com.art.timelymanagementsystem.entities.TimeLog;
+import com.art.timelymanagementsystem.entities.TimeLogPause;
 import com.art.timelymanagementsystem.entities.User;
 import com.art.timelymanagementsystem.exceptions.BadRequestException;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.TimeLogMapper;
+import com.art.timelymanagementsystem.mappers.TimeLogPauseMapper;
+import com.art.timelymanagementsystem.repositories.TimeLogPauseRepository;
 import com.art.timelymanagementsystem.repositories.TimeLogRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
 import com.art.timelymanagementsystem.request.TimeLogRequest;
@@ -28,6 +32,8 @@ public class TimeLogService {
     private final TimeLogRepository timeLogRepository;
     private final TimeLogMapper timeLogMapper;
     private final UserRepository userRepository;
+    private final TimeLogPauseRepository timeLogPauseRepository;
+    private final TimeLogPauseMapper timeLogPauseMapper;
 
     public List<TimeLogDto> getAllTimeLogService(){
 
@@ -120,11 +126,26 @@ public class TimeLogService {
 
     }
 
-    public List<TimeLogDto> getUserTimeLogsService(Long id){
+    public List<TimeLogDto> getUserTimeLogsService(Long userId){
 
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
-        return timeLogRepository.findByUserId(id).stream().map(timeLogMapper::toDto).toList();
+        return timeLogRepository.findByUserId(userId).stream().map(timeLogMapper::toDto).toList();
+
+    }
+
+    public TimeLogPauseDto pauseCurrentTimeLogService(Long timeLogId){
+
+        TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("Time Log Not Exists"));
+
+        TimeLogPause timeLogPause = new TimeLogPause();
+
+        timeLogPause.setTimeLogId(timeLog);
+        timeLogPause.setTimePause(LocalDateTime.now());
+
+        TimeLogPause newPause = timeLogPauseRepository.save(timeLogPause);
+
+        return timeLogPauseMapper.toDto(newPause);
 
     }
 
