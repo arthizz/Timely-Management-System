@@ -77,4 +77,11 @@ public class TimeLogController {
 
     }
 
+    @PostMapping("/resume/{timeLogId}/{timeLogPauseId}")
+    public ResponseEntity<TimeLogPauseDto> resumeCurrentTimeLog(@PathVariable Long timeLogId, @PathVariable Long timeLogPauseId){
+
+        return ResponseEntity.ok(timeLogService.resumeCurrentTimeLogService(timeLogId, timeLogPauseId));
+
+    }
+
 }

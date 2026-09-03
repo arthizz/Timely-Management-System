@@ -149,4 +149,18 @@ public class TimeLogService {
 
     }
 
+    public TimeLogPauseDto resumeCurrentTimeLogService(Long timeLogId, Long timeLogPauseId){
+
+        TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("Time log not exists"));
+
+        TimeLogPause timeLogPause = timeLogPauseRepository.findById(timeLogPauseId).orElseThrow(() -> new ResourceNotFoundException("Please pause your current timelog to resume"));
+
+        timeLogPause.setTimeResume(LocalDateTime.now());
+
+        TimeLogPause updateTimeLogPause = timeLogPauseRepository.save(timeLogPause);
+
+        return timeLogPauseMapper.toDto(updateTimeLogPause);
+
+    }
+
 }

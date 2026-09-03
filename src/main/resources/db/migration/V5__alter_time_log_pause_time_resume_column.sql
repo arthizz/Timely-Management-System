@@ -1,0 +1,2 @@
+ALTER TABLE time_log_pause
+MODIFY COLUMN time_resume TIMESTAMP NULL;
