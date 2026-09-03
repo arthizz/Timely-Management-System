@@ -10,5 +10,8 @@ public class TotalWorkHoursDto {
     private Long totalHours;
     private Integer totalMinutes;
     private Integer totalSeconds;
+    private Long totalBreakHours;
+    private Integer totalBreakMinutes;
+    private Integer totalBreakSeconds;
 
 }

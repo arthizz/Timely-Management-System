@@ -20,7 +20,7 @@ public class TimeLogPause {
 
     @ManyToOne
     @JoinColumn(name = "time_log_id", nullable = false)
-    private TimeLog timeLogId;
+    private TimeLog timeLog;
 
     @Column(name = "time_pause", nullable = true)
     private LocalDateTime timePause;

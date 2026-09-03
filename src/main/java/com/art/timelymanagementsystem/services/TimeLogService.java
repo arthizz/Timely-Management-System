@@ -47,7 +47,7 @@ public class TimeLogService {
 
     }
 
-    public ResponseEntity<TimeLogDto> createTimeLogService(TimeLogRequest timeLogRequest){
+    public ResponseEntity<TimeLogDto> clockInTimeLogService(TimeLogRequest timeLogRequest){
 
         User user = userRepository.findById(timeLogRequest.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -65,21 +65,27 @@ public class TimeLogService {
         timeLog.setTimeOut(null);
         timeLog.setIsNightShift(Boolean.TRUE.equals(timeLogRequest.getInNightShift()));
 
-        timeLog.setCreatedAt(LocalDateTime.now());
-
         timeLogRepository.save(timeLog);
 
         return ResponseEntity.ok(timeLogMapper.toDto(timeLog));
 
     }
 
-    public ResponseEntity<TimeLogDto> updateTimeLogService(Long timeLogId){
+    public ResponseEntity<TimeLogDto> clockOutTimeLogService(Long timeLogId){
 
         TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("TimeLog Does not Exists"));
 
         if(timeLog.getTimeOut() != null){
 
             throw new BadRequestException("User already timedOut, if you need to adjust please request it to the manager");
+
+        }
+
+        TimeLogPause activePause = timeLogPauseRepository.findCurrentActivePause(timeLogId).orElse(null);
+
+        if(activePause != null){
+
+            throw new BadRequestException("Please resume your break, before clocking out");
 
         }
 
@@ -111,6 +117,30 @@ public class TimeLogService {
                 LocalDate.now().plusDays(1).atStartOfDay()
         ).orElseThrow(() -> new ResourceNotFoundException("User does not have a Log yet"));
 
+        List<TimeLogPauseDto> timeLogPauseDtos = timeLogPauseRepository.findByTimeLogId(timeLogToday.getId()).stream().map(timeLogPauseMapper::toDto).toList();
+
+        Duration breakDuration = Duration.ZERO;
+
+        for (TimeLogPauseDto timeLogPauseDto : timeLogPauseDtos){
+
+            if(timeLogPauseDto.getTimeResume() == null){
+
+                throw new BadRequestException("There is an error on your time log pause record");
+
+            }
+
+            if(timeLogPauseDto.getTimePause() == null){
+
+                throw new BadRequestException("There is an error on your time log pause record");
+
+            }
+
+            Duration duration = Duration.between(timeLogPauseDto.getTimePause(), timeLogPauseDto.getTimeResume());
+
+            breakDuration = breakDuration.plus(duration);
+
+        }
+
         if(timeLogToday.getTimeOut() == null){
 
             throw new BadRequestException("User has not time out yet");
@@ -122,13 +152,13 @@ public class TimeLogService {
 
         Duration duration = Duration.between(timeLogIn, timeLogOut);
 
-        return new TotalWorkHoursDto(duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+        return new TotalWorkHoursDto(duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart(), breakDuration.toHours(), breakDuration.toMinutesPart(), breakDuration.toSecondsPart());
 
     }
 
     public List<TimeLogDto> getUserTimeLogsService(Long userId){
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
         return timeLogRepository.findByUserId(userId).stream().map(timeLogMapper::toDto).toList();
 
@@ -138,9 +168,23 @@ public class TimeLogService {
 
         TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("Time Log Not Exists"));
 
+        TimeLogPause activePause = timeLogPauseRepository.findCurrentActivePause(timeLogId).orElse(null);
+
+        if(timeLog.getTimeOut() != null){
+
+            throw new BadRequestException("Cannot pause a completed timelog");
+
+        }
+
+        if(activePause != null){
+
+            throw new BadRequestException("You are currently on pause break, please resume your time log");
+
+        }
+
         TimeLogPause timeLogPause = new TimeLogPause();
 
-        timeLogPause.setTimeLogId(timeLog);
+        timeLogPause.setTimeLog(timeLog);
         timeLogPause.setTimePause(LocalDateTime.now());
 
         TimeLogPause newPause = timeLogPauseRepository.save(timeLogPause);
@@ -149,17 +193,43 @@ public class TimeLogService {
 
     }
 
-    public TimeLogPauseDto resumeCurrentTimeLogService(Long timeLogId, Long timeLogPauseId){
-
-        TimeLog timeLog = timeLogRepository.findById(timeLogId).orElseThrow(() -> new ResourceNotFoundException("Time log not exists"));
+    public TimeLogPauseDto resumeCurrentTimeLogService(Long timeLogPauseId){
 
         TimeLogPause timeLogPause = timeLogPauseRepository.findById(timeLogPauseId).orElseThrow(() -> new ResourceNotFoundException("Please pause your current timelog to resume"));
+
+        TimeLog timeLog = timeLogPause.getTimeLog();
+
+        if(timeLog.getTimeOut() != null){
+
+            throw new BadRequestException("Cannot Resume a completed time log");
+
+        }
+
+        if(timeLogPause.getTimePause() == null){
+
+            throw new BadRequestException("Pause record is invalid");
+
+        }
+
+        if(timeLogPause.getTimeResume() != null){
+
+            throw new BadRequestException("Break has already been resumed");
+
+        }
 
         timeLogPause.setTimeResume(LocalDateTime.now());
 
         TimeLogPause updateTimeLogPause = timeLogPauseRepository.save(timeLogPause);
 
         return timeLogPauseMapper.toDto(updateTimeLogPause);
+
+    }
+
+    public TimeLogPauseDto calculateUserWorkDuration(Long userId){
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+
 
     }
 

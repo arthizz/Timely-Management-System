@@ -36,16 +36,16 @@ public class TimeLogController {
     }
 
     @PostMapping
-    public ResponseEntity<TimeLogDto> createTimeLog(@Valid @RequestBody TimeLogRequest timeLogRequest){
+    public ResponseEntity<TimeLogDto> clockInTimeLog(@Valid @RequestBody TimeLogRequest timeLogRequest){
 
-        return timeLogService.createTimeLogService(timeLogRequest);
+        return timeLogService.clockInTimeLogService(timeLogRequest);
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TimeLogDto> updateTimeLog(@PathVariable Long id){
+    public ResponseEntity<TimeLogDto> clockOutTimeLog(@PathVariable Long id){
 
-        return timeLogService.updateTimeLogService(id);
+        return timeLogService.clockOutTimeLogService(id);
 
     }
 
@@ -77,10 +77,17 @@ public class TimeLogController {
 
     }
 
-    @PostMapping("/resume/{timeLogId}/{timeLogPauseId}")
-    public ResponseEntity<TimeLogPauseDto> resumeCurrentTimeLog(@PathVariable Long timeLogId, @PathVariable Long timeLogPauseId){
+    @PostMapping("/resume/{timeLogPauseId}")
+    public ResponseEntity<TimeLogPauseDto> resumeCurrentTimeLog(@PathVariable Long timeLogPauseId){
 
-        return ResponseEntity.ok(timeLogService.resumeCurrentTimeLogService(timeLogId, timeLogPauseId));
+        return ResponseEntity.ok(timeLogService.resumeCurrentTimeLogService(timeLogPauseId));
+
+    }
+
+    @GetMapping("/duration/{userId}")
+    public ResponseEntity<TimeLogPauseDto> calculateUserWorkDuration(@PathVariable Long userId){
+
+        return ResponseEntity.ok(timeLogService.calculateUserWorkDuration(userId));
 
     }
 

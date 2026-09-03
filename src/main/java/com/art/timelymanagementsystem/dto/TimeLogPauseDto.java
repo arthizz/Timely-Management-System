@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 public class TimeLogPauseDto {
     private Long id;
+    private LocalDateTime timePause;
     private LocalDateTime timeResume;
     private LocalDateTime createdAt;
 }
