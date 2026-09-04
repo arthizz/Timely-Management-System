@@ -85,7 +85,7 @@ public class TimeLogController {
     }
 
     @GetMapping("/duration/{userId}")
-    public ResponseEntity<TimeLogPauseDto> calculateUserWorkDuration(@PathVariable Long userId){
+    public ResponseEntity<TotalWorkHoursDto> calculateUserWorkDuration(@PathVariable Long userId){
 
         return ResponseEntity.ok(timeLogService.calculateUserWorkDuration(userId));
 

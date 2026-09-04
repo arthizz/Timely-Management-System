@@ -225,11 +225,52 @@ public class TimeLogService {
 
     }
 
-    public TimeLogPauseDto calculateUserWorkDuration(Long userId){
+    public TotalWorkHoursDto calculateUserWorkDuration(Long userId){
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
+        List<TimeLogDto> timeLogDtoList = timeLogRepository.findByUserId(user.getId()).stream().map(timeLogMapper::toDto).toList();
 
+        Duration totalWorkHours = Duration.ZERO;
+        Duration totalBreakHours = Duration.ZERO;
+        if(!timeLogDtoList.isEmpty()){
+
+            for (TimeLogDto timeLogDto : timeLogDtoList){
+
+                Duration workDuration = Duration.between(timeLogDto.getTimeIn(), timeLogDto.getTimeOut());
+
+                List<TimeLogPauseDto> timeLogPauseDtoList = timeLogPauseRepository.findByTimeLogId(timeLogDto.getId()).stream().map(timeLogPauseMapper::toDto).toList();
+                Duration totalBreakDuration = Duration.ZERO;
+                if(!timeLogPauseDtoList.isEmpty()){
+
+                    for (TimeLogPauseDto timeLogPauseDto : timeLogPauseDtoList){
+
+                        Duration breakDuration = Duration.between(timeLogPauseDto.getTimePause(), timeLogPauseDto.getTimeResume());
+
+                        totalBreakDuration = totalBreakDuration.plus(breakDuration);
+
+                    }
+
+                    workDuration = workDuration.minus(totalBreakDuration);
+
+                }
+
+                totalBreakHours = totalBreakHours.plus(totalBreakDuration);
+
+                totalWorkHours = totalWorkHours.plus(workDuration);
+
+            }
+
+        }
+
+        return new TotalWorkHoursDto(
+                totalWorkHours.toHours(),
+                totalWorkHours.toMinutesPart(),
+                totalWorkHours.toSecondsPart(),
+                totalBreakHours.toHours(),
+                totalBreakHours.toMinutesPart(),
+                totalBreakHours.toSecondsPart()
+        );
 
     }
 
