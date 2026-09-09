@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -85,9 +86,9 @@ public class TimeLogController {
     }
 
     @GetMapping("/duration/{userId}")
-    public ResponseEntity<TotalWorkHoursDto> calculateUserWorkDuration(@PathVariable Long userId){
+    public ResponseEntity<TotalWorkHoursDto> calculateUserWorkDuration(@PathVariable Long userId, @RequestParam LocalDate from, @RequestParam LocalDate to){
 
-        return ResponseEntity.ok(timeLogService.calculateUserWorkDuration(userId));
+        return ResponseEntity.ok(timeLogService.calculateUserWorkDuration(userId, from, to));
 
     }
 

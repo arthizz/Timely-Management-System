@@ -225,41 +225,37 @@ public class TimeLogService {
 
     }
 
-    public TotalWorkHoursDto calculateUserWorkDuration(Long userId){
+    public TotalWorkHoursDto calculateUserWorkDuration(Long userId, LocalDate from, LocalDate to){
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
-
-        List<TimeLogDto> timeLogDtoList = timeLogRepository.findByUserId(user.getId()).stream().map(timeLogMapper::toDto).toList();
+        LocalDateTime startDate = from.atStartOfDay();
+        LocalDateTime endDate = to.plusDays(1).atStartOfDay();
+        List<TimeLogDto> timeLogDtoList = timeLogRepository.findUserTimeLogByDateRange(user.getId(), startDate, endDate).stream().map(timeLogMapper::toDto).toList();
 
         Duration totalWorkHours = Duration.ZERO;
         Duration totalBreakHours = Duration.ZERO;
-        if(!timeLogDtoList.isEmpty()){
 
-            for (TimeLogDto timeLogDto : timeLogDtoList){
+        for (TimeLogDto timeLogDto : timeLogDtoList){
 
-                Duration workDuration = Duration.between(timeLogDto.getTimeIn(), timeLogDto.getTimeOut());
+            Duration workDuration = Duration.between(timeLogDto.getTimeIn(), timeLogDto.getTimeOut());
 
-                List<TimeLogPauseDto> timeLogPauseDtoList = timeLogPauseRepository.findByTimeLogId(timeLogDto.getId()).stream().map(timeLogPauseMapper::toDto).toList();
-                Duration totalBreakDuration = Duration.ZERO;
-                if(!timeLogPauseDtoList.isEmpty()){
+            List<TimeLogPauseDto> timeLogPauseDtoList = timeLogPauseRepository.findByTimeLogId(timeLogDto.getId()).stream().map(timeLogPauseMapper::toDto).toList();
+            Duration totalBreakDuration = Duration.ZERO;
 
-                    for (TimeLogPauseDto timeLogPauseDto : timeLogPauseDtoList){
+            for (TimeLogPauseDto timeLogPauseDto : timeLogPauseDtoList){
 
-                        Duration breakDuration = Duration.between(timeLogPauseDto.getTimePause(), timeLogPauseDto.getTimeResume());
+                Duration breakDuration = Duration.between(timeLogPauseDto.getTimePause(), timeLogPauseDto.getTimeResume());
 
-                        totalBreakDuration = totalBreakDuration.plus(breakDuration);
-
-                    }
-
-                    workDuration = workDuration.minus(totalBreakDuration);
-
-                }
-
-                totalBreakHours = totalBreakHours.plus(totalBreakDuration);
-
-                totalWorkHours = totalWorkHours.plus(workDuration);
+                totalBreakDuration = totalBreakDuration.plus(breakDuration);
 
             }
+
+            workDuration = workDuration.minus(totalBreakDuration);
+
+
+            totalBreakHours = totalBreakHours.plus(totalBreakDuration);
+
+            totalWorkHours = totalWorkHours.plus(workDuration);
 
         }
 

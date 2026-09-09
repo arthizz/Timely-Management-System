@@ -31,12 +31,13 @@ public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
         SELECT t
         FROM TimeLog t
         WHERE t.user.id = :userId
-            AND t.createdAt >= :startDate
-            AND t.createdAt < :endDate
+            AND t.timeIn >= :startDate
+            AND t.timeIn < :endDate
     """)
     List<TimeLog> findUserTimeLogByDateRange(
             @Param("userId") Long userId,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
             );
+
 }
