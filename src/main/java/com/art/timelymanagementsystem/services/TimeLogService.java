@@ -16,6 +16,7 @@ import com.art.timelymanagementsystem.repositories.TimeLogRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
 import com.art.timelymanagementsystem.request.TimeLogRequest;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TimeLogService {
@@ -237,12 +239,29 @@ public class TimeLogService {
 
         for (TimeLogDto timeLogDto : timeLogDtoList){
 
+            if(timeLogDto.getTimeOut() == null){
+
+                log.warn("Skipping one of incomplete time log {}", timeLogDto.getId());
+                continue;
+
+            }
+
             Duration workDuration = Duration.between(timeLogDto.getTimeIn(), timeLogDto.getTimeOut());
 
             List<TimeLogPauseDto> timeLogPauseDtoList = timeLogPauseRepository.findByTimeLogId(timeLogDto.getId()).stream().map(timeLogPauseMapper::toDto).toList();
             Duration totalBreakDuration = Duration.ZERO;
 
             for (TimeLogPauseDto timeLogPauseDto : timeLogPauseDtoList){
+
+                if(timeLogPauseDto.getTimeResume() == null){
+
+                    log.warn("Skipping one of log pause/break check your time log break data with timelog id {} and for time break id {}",
+                            timeLogDto.getId(),
+                            timeLogPauseDto.getId()
+                    );
+                    continue;
+
+                }
 
                 Duration breakDuration = Duration.between(timeLogPauseDto.getTimePause(), timeLogPauseDto.getTimeResume());
 
