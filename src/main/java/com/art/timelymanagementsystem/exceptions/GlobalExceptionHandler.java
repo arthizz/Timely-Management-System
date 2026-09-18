@@ -1,7 +1,6 @@
 package com.art.timelymanagementsystem.exceptions;
 
 import com.art.timelymanagementsystem.dto.ErrorResponseDto;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,7 +14,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationException( MethodArgumentNotValidException e ){
 
-        String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        var fieldError = e.getBindingResult().getFieldError();
+
+        String message = fieldError != null ? fieldError.getDefaultMessage() : "Validation failed";
 
         return ResponseEntity.badRequest().body(new ErrorResponseDto(400, message));
 

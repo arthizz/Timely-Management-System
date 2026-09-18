@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @ToString
@@ -33,6 +34,9 @@ public class TimeLog {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "timeLog", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TimeLogPause> timeLogPause;
 
     @PrePersist
     public void onCreate(){

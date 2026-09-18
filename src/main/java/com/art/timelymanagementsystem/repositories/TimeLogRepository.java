@@ -30,6 +30,7 @@ public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
     @Query("""
         SELECT t
         FROM TimeLog t
+        JOIN FETCH t.timeLogPause
         WHERE t.user.id = :userId
             AND t.timeIn >= :startDate
             AND t.timeIn < :endDate

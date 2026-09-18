@@ -228,7 +228,6 @@ public class TimeLogService {
     }
 
     public TotalWorkHoursDto calculateUserWorkDuration(Long userId, LocalDate from, LocalDate to){
-
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         LocalDateTime startDate = from.atStartOfDay();
         LocalDateTime endDate = to.plusDays(1).atStartOfDay();
@@ -248,10 +247,9 @@ public class TimeLogService {
 
             Duration workDuration = Duration.between(timeLogDto.getTimeIn(), timeLogDto.getTimeOut());
 
-            List<TimeLogPauseDto> timeLogPauseDtoList = timeLogPauseRepository.findByTimeLogId(timeLogDto.getId()).stream().map(timeLogPauseMapper::toDto).toList();
             Duration totalBreakDuration = Duration.ZERO;
 
-            for (TimeLogPauseDto timeLogPauseDto : timeLogPauseDtoList){
+            for (TimeLogPauseDto timeLogPauseDto : timeLogDto.getTimeLogPause()){
 
                 if(timeLogPauseDto.getTimeResume() == null){
 
