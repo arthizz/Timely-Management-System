@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -235,6 +236,12 @@ public class TimeLogService {
 
         Duration totalWorkHours = Duration.ZERO;
         Duration totalBreakHours = Duration.ZERO;
+
+        if(from == to || from.isAfter(to)){
+
+            throw new BadRequestException("Error on validating the dates");
+
+        }
 
         for (TimeLogDto timeLogDto : timeLogDtoList){
 

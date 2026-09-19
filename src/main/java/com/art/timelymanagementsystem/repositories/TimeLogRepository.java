@@ -28,7 +28,7 @@ public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
             @Param("startOfNextDay") LocalDateTime startOfNextDay);
 
     @Query("""
-        SELECT t
+        SELECT DISTINCT t
         FROM TimeLog t
         JOIN FETCH t.timeLogPause
         WHERE t.user.id = :userId
