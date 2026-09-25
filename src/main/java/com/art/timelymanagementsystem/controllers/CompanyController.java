@@ -43,7 +43,7 @@ public class CompanyController {
 
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<CompanyDto> createCompany(@Valid @RequestBody CompanyRequest companyRequest){
 
         return companyService.createCompanyService(companyRequest);
