@@ -19,7 +19,17 @@ public class UserLevel {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "user_level_name", nullable = false)
+    private String userLevelName;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist(){
+
+        createdAt = LocalDateTime.now();
+
+    }
 
 }

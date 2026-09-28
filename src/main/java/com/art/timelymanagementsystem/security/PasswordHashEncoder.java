@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class PasswordHashEncoder {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -32,10 +33,14 @@ public class PasswordHashEncoder {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/company/register").permitAll()
+                        .requestMatchers("/api/users/admin-test").hasAuthority("ADMIN")
+                        .requestMatchers("/api/users/hr-test").hasAuthority("HR")
+                        .requestMatchers("/api/users/employee-test").hasAuthority("EMPLOYEE")
                         .anyRequest().authenticated()
                 );
 

@@ -32,7 +32,7 @@ public class User {
     private String password;
 
     @Column(name = "user_level_id", nullable = false)
-    private Short userLevelId;
+    private Long userLevelId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = true)

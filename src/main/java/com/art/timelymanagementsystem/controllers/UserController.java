@@ -7,6 +7,7 @@ import com.art.timelymanagementsystem.request.UpdateUserRequest;
 import com.art.timelymanagementsystem.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +68,27 @@ public class UserController {
     public ResponseEntity<UserDto> getCurrentUser(){
 
         return ResponseEntity.ok(userService.getCurrentUserService());
+
+    }
+
+    @GetMapping("/admin-test")
+    public ResponseEntity<String> adminTest(){
+
+        return ResponseEntity.ok("This is for Admin only");
+
+    }
+
+    @GetMapping("/hr-test")
+    public ResponseEntity<String> hrTest(){
+
+        return ResponseEntity.ok("this is for hr only");
+
+    }
+
+    @GetMapping("/employee-test")
+    public ResponseEntity<String> employeeTest(){
+
+        return ResponseEntity.ok("This is for employee only");
 
     }
 

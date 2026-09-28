@@ -19,7 +19,7 @@ public class UserRequest {
     private String email;
 
     @NotNull(message = "User Level Required")
-    private Short userLevelId;
+    private Long userLevelId;
 
     @NotBlank(message = "First name Required")
     private String firstName;
