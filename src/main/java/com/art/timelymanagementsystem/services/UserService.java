@@ -167,4 +167,10 @@ public class UserService {
 
     }
 
+    public List<UserDto> getUsersByCompanyService(Long id){
+
+
+
+    }
+
 }

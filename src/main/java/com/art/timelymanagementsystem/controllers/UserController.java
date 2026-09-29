@@ -20,7 +20,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<UserDto>> getAllUsers(@RequestParam(required = false, defaultValue = "id") String sort){
 
         return ResponseEntity.ok(userService.getAllUsersService());
@@ -35,7 +35,7 @@ public class UserController {
 
     }
 
-    @PostMapping
+    @PostMapping("/create-user")
     public UserDto createNewUser(@Valid @RequestBody CreateUserRequest request){
 
         return userService.createUser(request);
@@ -50,17 +50,24 @@ public class UserController {
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update-user/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,@Valid @RequestBody UpdateUserRequest request){
 
         return userService.updateUser(id, request);
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-user/{id}")
     public ResponseEntity<MessageResponseDto> DeleteUser(@PathVariable Long id){
 
         return ResponseEntity.ok(userService.deleteUserService(id));
+
+    }
+
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<List<UserDto>> getUserByCompany(@PathVariable Long companyId){
+
+        return ResponseEntity.ok(userService.getUsersByCompanyService(companyId));
 
     }
 
@@ -68,27 +75,6 @@ public class UserController {
     public ResponseEntity<UserDto> getCurrentUser(){
 
         return ResponseEntity.ok(userService.getCurrentUserService());
-
-    }
-
-    @GetMapping("/admin-test")
-    public ResponseEntity<String> adminTest(){
-
-        return ResponseEntity.ok("This is for Admin only");
-
-    }
-
-    @GetMapping("/hr-test")
-    public ResponseEntity<String> hrTest(){
-
-        return ResponseEntity.ok("this is for hr only");
-
-    }
-
-    @GetMapping("/employee-test")
-    public ResponseEntity<String> employeeTest(){
-
-        return ResponseEntity.ok("This is for employee only");
 
     }
 
