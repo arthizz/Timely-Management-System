@@ -27,7 +27,10 @@ public class CompanyController {
     @GetMapping
     public ResponseEntity<List<CompanyDto>> getAllCompany(){
 
-        List<CompanyDto> companies = companyRepository.findAll().stream().map(companyMapper::toDto).toList();
+        List<CompanyDto> companies = companyRepository.
+                findAll().
+                stream().
+                map(companyMapper::toDto).toList();
 
         return ResponseEntity.ok(companies);
 
@@ -37,7 +40,10 @@ public class CompanyController {
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDto> getCompany(@PathVariable(name = "id") Long id){
 
-        CompanyDto company = companyRepository.findById(id).map(companyMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("Company Not Found"));
+        CompanyDto company = companyRepository.
+                findById(id).
+                map(companyMapper::toDto).
+                orElseThrow(() -> new ResourceNotFoundException("Company Not Found"));
 
         return ResponseEntity.ok(company);
 
@@ -53,7 +59,9 @@ public class CompanyController {
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDto> updateCompany(@PathVariable Long id, @Valid @RequestBody CompanyRequest companyRequest){
 
-        Company company = companyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Unable to update company, company does not exists"));
+        Company company = companyRepository.
+                findById(id).
+                orElseThrow(() -> new ResourceNotFoundException("Unable to update company, company does not exists"));
 
 
         return companyService.updateCompanyService(company, companyRequest);
@@ -63,7 +71,9 @@ public class CompanyController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCompany(@PathVariable Long id){
 
-        Company company = companyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Failed! cant delete user does not exists"));
+        Company company = companyRepository.
+                findById(id).
+                orElseThrow(() -> new ResourceNotFoundException("Failed! cant delete user does not exists"));
 
         companyRepository.delete(company);
 

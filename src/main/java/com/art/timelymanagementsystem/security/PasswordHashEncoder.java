@@ -38,12 +38,19 @@ public class PasswordHashEncoder {
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/company/register").permitAll()
-                        .requestMatchers("/api/users/all").hasAuthority("ADMIN")
+
+                        // Admin Only Auth
+                        .requestMatchers(
+                                "/api/users/all"
+                        ).hasAuthority("ADMIN")
+
+                        // Admin & HR auth
                         .requestMatchers(
                                 "/api/users/{id}",
                                 "/api/users/create-user",
                                 "/api/users/update-user/{id}",
-                                "/api/users/delete-user/{id}"
+                                "/api/users/delete-user/{id}",
+                                "/api/users/company/{companyId}"
                         ).hasAnyAuthority("ADMIN", "HR")
                         .anyRequest().authenticated()
                 );

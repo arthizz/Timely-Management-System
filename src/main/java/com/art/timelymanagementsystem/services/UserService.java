@@ -169,7 +169,7 @@ public class UserService {
 
     public List<UserDto> getUsersByCompanyService(Long id){
 
-
+        return  userRepository.findByCompanyId(id).stream().map(userMapper::toDto).toList();
 
     }
 
