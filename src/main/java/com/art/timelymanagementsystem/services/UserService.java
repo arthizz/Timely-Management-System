@@ -5,11 +5,13 @@ import com.art.timelymanagementsystem.dto.UserDto;
 import com.art.timelymanagementsystem.entities.Company;
 import com.art.timelymanagementsystem.entities.CompanyRole;
 import com.art.timelymanagementsystem.entities.User;
+import com.art.timelymanagementsystem.entities.UserLevel;
 import com.art.timelymanagementsystem.exceptions.BadRequestException;
 import com.art.timelymanagementsystem.exceptions.ResourceNotFoundException;
 import com.art.timelymanagementsystem.mappers.UserMapper;
 import com.art.timelymanagementsystem.repositories.CompanyRepository;
 import com.art.timelymanagementsystem.repositories.CompanyRoleRepository;
+import com.art.timelymanagementsystem.repositories.UserLevelRepository;
 import com.art.timelymanagementsystem.repositories.UserRepository;
 import com.art.timelymanagementsystem.request.CreateUserRequest;
 import com.art.timelymanagementsystem.request.UpdateUserRequest;
@@ -34,6 +36,7 @@ public class UserService {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserLevelRepository userLevelRepository;
 
     public List<UserDto> getAllUsersService(){
 
@@ -115,9 +118,11 @@ public class UserService {
 
         }
 
+        UserLevel userLevel = userLevelRepository.findById(userRequest.getUserLevelId()).orElseThrow(() -> new ResourceNotFoundException("User level does not exists"));
+
         user.setUserName(userRequest.getUserName());
         user.setEmail(userRequest.getEmail());
-        user.setUserLevelId(userRequest.getUserLevelId());
+        user.setUserLevel(userLevel);
 
         if(userRequest.getHourlyRate() != null){
 

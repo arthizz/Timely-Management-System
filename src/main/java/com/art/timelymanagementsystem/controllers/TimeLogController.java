@@ -36,21 +36,21 @@ public class TimeLogController {
 
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<TimeLogDto> clockInTimeLog(@Valid @RequestBody TimeLogRequest timeLogRequest){
 
         return timeLogService.clockInTimeLogService(timeLogRequest);
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/clock-out/{id}")
     public ResponseEntity<TimeLogDto> clockOutTimeLog(@PathVariable Long id){
 
         return timeLogService.clockOutTimeLogService(id);
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<MessageResponseDto> deleteTimeLog(@PathVariable Long id){
 
         return ResponseEntity.ok(timeLogService.deleteTimeLogService(id));

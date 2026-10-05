@@ -31,8 +31,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "user_level_id", nullable = false)
-    private Long userLevelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_level_id", nullable = false)
+    private UserLevel userLevel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = true)

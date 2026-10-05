@@ -50,7 +50,9 @@ public class PasswordHashEncoder {
                                 "/api/users/create-user",
                                 "/api/users/update-user/{id}",
                                 "/api/users/delete-user/{id}",
-                                "/api/users/company/{companyId}"
+                                "/api/users/company/{companyId}",
+                                "/api/timelog",
+                                "/api/timelog/{id}"
                         ).hasAnyAuthority("ADMIN", "HR")
                         .anyRequest().authenticated()
                 );

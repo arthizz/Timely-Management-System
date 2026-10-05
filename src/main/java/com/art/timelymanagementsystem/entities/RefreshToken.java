@@ -6,28 +6,33 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+@Entity
 @Getter
 @Setter
 @ToString
-@Entity
-@Table(name = "user_level")
-public class UserLevel {
+@Table(name = "refresh_token")
+public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_level_name", nullable = false)
-    private String userLevelName;
+    @Column(name = "token_hash", nullable = false)
+    private String tokenHash;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "expires_at", nullable = false)
+    private LocalDateTime expiresAt;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "userLevel", fetch = FetchType.LAZY)
-    private List<User> users;
+    @Column(name = "revoked", nullable = false)
+    private Boolean revoked = false;
 
     @PrePersist
     public void prePersist(){
