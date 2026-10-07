@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "user")
 @Table(name = "refresh_token")
 public class RefreshToken {
 
@@ -32,7 +32,7 @@ public class RefreshToken {
     private LocalDateTime createdAt;
 
     @Column(name = "revoked", nullable = false)
-    private Boolean revoked = false;
+    private boolean revoked = false;
 
     @PrePersist
     public void prePersist(){

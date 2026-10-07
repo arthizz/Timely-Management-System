@@ -22,7 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService{
     public UserDetails loadUserByUsername(String username){
 
         User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        UserLevel userLevel = userLevelRepository.findById(user.getUserLevelId()).orElseThrow(() -> new UsernameNotFoundException("User Level Not Found"));
+
+        UserLevel userLevel = userLevelRepository.findById(user.getUserLevel().getId()).orElseThrow(() -> new UsernameNotFoundException("User Level Not Found"));
 
         return org.springframework.security.core.userdetails.User.
                 withUsername(user.getEmail()).
