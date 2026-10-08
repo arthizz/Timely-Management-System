@@ -2,7 +2,10 @@ package com.art.timelymanagementsystem.controllers;
 
 
 import com.art.timelymanagementsystem.dto.LoginResponseDto;
+import com.art.timelymanagementsystem.entities.RefreshToken;
 import com.art.timelymanagementsystem.request.LoginRequest;
+import com.art.timelymanagementsystem.request.RefreshTokenRequest;
+import com.art.timelymanagementsystem.services.RefreshTokenService;
 import com.art.timelymanagementsystem.services.UserAuthenticationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,6 +23,7 @@ import java.security.SecureRandom;
 public class AuthController {
 
     private final UserAuthenticationService userAuthenticationService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequest request){
@@ -29,9 +33,11 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<String> refreshAuthToken(){
+    public ResponseEntity<LoginResponseDto> refreshAuthToken(@Valid @RequestBody RefreshTokenRequest request){
 
-        return ResponseEntity.ok("Token Refresh");
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.getRefreshToken());
+
+        return ResponseEntity.ok(refreshTokenService.refreshAccessToken(refreshToken, request.getRefreshToken()));
 
     }
 

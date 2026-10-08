@@ -1,9 +1,12 @@
 package com.art.timelymanagementsystem.services;
 
+import com.art.timelymanagementsystem.dto.LoginResponseDto;
 import com.art.timelymanagementsystem.entities.RefreshToken;
 import com.art.timelymanagementsystem.entities.User;
+import com.art.timelymanagementsystem.exceptions.BadRequestException;
 import com.art.timelymanagementsystem.repositories.RefreshTokenRepository;
-import lombok.AllArgsConstructor;
+import com.art.timelymanagementsystem.security.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -14,11 +17,12 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final JwtService jwtService;
 
     public String generateRefreshToken(){
 
@@ -63,6 +67,43 @@ public class RefreshTokenService {
         refreshTokenRepository.save(refreshToken);
 
         return rawToken;
+
+    }
+
+    public RefreshToken validateRefreshToken(String rawToken){
+
+        String tokenHash = hashRefreshToken(rawToken);
+
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash).orElseThrow(() -> new BadRequestException("Refresh token invalid"));
+
+        if(refreshToken.isRevoked()){
+
+            throw new BadRequestException("Please login again to generate a new one");
+
+        }
+
+        if(refreshToken.getExpiresAt().isBefore(LocalDateTime.now())){
+
+            throw new BadRequestException("Refresh token expired");
+
+        }
+
+        return refreshToken;
+
+    }
+
+    public LoginResponseDto refreshAccessToken(RefreshToken refreshToken, String rawToken){
+
+        User user = refreshToken.getUser();
+
+        String jwt = jwtService.generateJwt(user.getEmail());
+
+        LoginResponseDto loginResponseDto = new LoginResponseDto();
+
+        loginResponseDto.setRefreshToken(rawToken);
+        loginResponseDto.setAccessToken(jwt);
+
+        return loginResponseDto;
 
     }
 

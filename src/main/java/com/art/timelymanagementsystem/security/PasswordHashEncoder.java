@@ -37,7 +37,8 @@ public class PasswordHashEncoder {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/login",
-                                "/api/company/register").permitAll()
+                                "/api/company/register",
+                                "/api/auth/refresh").permitAll()
 
                         // Admin Only Auth
                         .requestMatchers(
