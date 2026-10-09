@@ -38,7 +38,8 @@ public class PasswordHashEncoder {
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/company/register",
-                                "/api/auth/refresh").permitAll()
+                                "/api/auth/refresh",
+                                "/api/auth/logout").permitAll()
 
                         // Admin Only Auth
                         .requestMatchers(

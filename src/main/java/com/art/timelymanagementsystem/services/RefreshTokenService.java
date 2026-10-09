@@ -107,4 +107,12 @@ public class RefreshTokenService {
 
     }
 
+    public void revokeRefreshToken(String rawToken){
+
+        RefreshToken refreshToken = validateRefreshToken(rawToken);
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
+
+    }
+
 }

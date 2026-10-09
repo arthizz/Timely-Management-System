@@ -2,6 +2,7 @@ package com.art.timelymanagementsystem.controllers;
 
 
 import com.art.timelymanagementsystem.dto.LoginResponseDto;
+import com.art.timelymanagementsystem.dto.LogoutResponseDto;
 import com.art.timelymanagementsystem.entities.RefreshToken;
 import com.art.timelymanagementsystem.request.LoginRequest;
 import com.art.timelymanagementsystem.request.RefreshTokenRequest;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.security.SecureRandom;
 
 @AllArgsConstructor
 @RestController
@@ -38,6 +37,18 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.getRefreshToken());
 
         return ResponseEntity.ok(refreshTokenService.refreshAccessToken(refreshToken, request.getRefreshToken()));
+
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponseDto> logout(@Valid @RequestBody RefreshTokenRequest request){
+
+        refreshTokenService.revokeRefreshToken(request.getRefreshToken());
+
+        LogoutResponseDto logoutResponseDto = new LogoutResponseDto();
+        logoutResponseDto.setMessage("Logout Success");
+
+        return ResponseEntity.ok(logoutResponseDto);
 
     }
 
