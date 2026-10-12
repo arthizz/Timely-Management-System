@@ -1,5 +1,6 @@
 package com.art.timelymanagementsystem.security;
 
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -7,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
@@ -54,6 +58,19 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getId();
+
+    }
+
+    public LocalDateTime extractExpiration(String token){
+
+        Date expiration = Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+
+        return expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
     }
 
