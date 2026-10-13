@@ -1,5 +1,7 @@
 package com.art.timelymanagementsystem.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -33,7 +35,7 @@ public class JwtService {
                 .id(UUID.randomUUID().toString())
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 2))
                 .signWith(getSignInKey())
                 .compact();
 
@@ -71,6 +73,22 @@ public class JwtService {
                 .getExpiration();
 
         return expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+    }
+
+    public Claims extractClaimsForLogout(String token){
+
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        }catch (ExpiredJwtException e){
+
+            return e.getClaims();
+
+        }
 
     }
 

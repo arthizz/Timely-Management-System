@@ -115,4 +115,25 @@ public class RefreshTokenService {
 
     }
 
+    public LoginResponseDto rotateRefreshToken(String rawToken){
+
+        RefreshToken currentToken = validateRefreshToken(rawToken);
+
+        User user = currentToken.getUser();
+
+        currentToken.setRevoked(true);
+        refreshTokenRepository.save(currentToken);
+
+        String newRefreshToken = createRefreshToken(user);
+
+        String newAccessToken = jwtService.generateJwt(user.getEmail());
+
+        LoginResponseDto loginResponseDto = new LoginResponseDto();
+        loginResponseDto.setAccessToken(newAccessToken);
+        loginResponseDto.setRefreshToken(newRefreshToken);
+
+        return loginResponseDto;
+
+    }
+
 }
