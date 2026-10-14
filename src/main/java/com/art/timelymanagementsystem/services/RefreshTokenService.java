@@ -8,6 +8,7 @@ import com.art.timelymanagementsystem.repositories.RefreshTokenRepository;
 import com.art.timelymanagementsystem.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -115,22 +116,34 @@ public class RefreshTokenService {
 
     }
 
+    @Transactional
     public LoginResponseDto rotateRefreshToken(String rawToken){
 
-        RefreshToken currentToken = validateRefreshToken(rawToken);
+        String tokenHash = hashRefreshToken(rawToken);
 
-        User user = currentToken.getUser();
+        RefreshToken currentToken = refreshTokenRepository.findByTokenHashForUpdate(tokenHash).orElseThrow(() -> new BadRequestException("Refresh token invalid"));
+
+        if(currentToken.isRevoked()){
+
+            throw new BadRequestException("Please login again to generate a new token");
+
+        }
+
+        if(currentToken.getExpiresAt().isBefore(LocalDateTime.now())){
+
+            throw new BadRequestException("Refresh token expired");
+
+        }
 
         currentToken.setRevoked(true);
-        refreshTokenRepository.save(currentToken);
+        User user = currentToken.getUser();
 
         String newRefreshToken = createRefreshToken(user);
-
         String newAccessToken = jwtService.generateJwt(user.getEmail());
 
         LoginResponseDto loginResponseDto = new LoginResponseDto();
-        loginResponseDto.setAccessToken(newAccessToken);
         loginResponseDto.setRefreshToken(newRefreshToken);
+        loginResponseDto.setAccessToken(newAccessToken);
 
         return loginResponseDto;
 
