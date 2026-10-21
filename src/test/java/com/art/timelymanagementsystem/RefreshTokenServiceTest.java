@@ -9,6 +9,7 @@ import com.art.timelymanagementsystem.security.JwtService;
 import com.art.timelymanagementsystem.services.RefreshTokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,7 +19,9 @@ import java.util.Optional;
 
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -175,12 +178,84 @@ public class RefreshTokenServiceTest {
                 .thenReturn("mock-access-token");
 
         LoginResponseDto loginResponseDto = refreshTokenService.rotateRefreshToken("valid-refresh-token");
+//        verify(refreshTokenRepository).save(any(RefreshToken.class));
+
+        ArgumentCaptor<RefreshToken> captor = ArgumentCaptor.forClass(RefreshToken.class);
+        verify(refreshTokenRepository).save(captor.capture());
+        RefreshToken savedToken = captor.getValue();
 
         assertNotNull(loginResponseDto);
         assertEquals("mock-access-token", loginResponseDto.getAccessToken());
         assertNotNull(loginResponseDto.getRefreshToken());
         assertFalse(loginResponseDto.getRefreshToken().isBlank());
         assertTrue(refreshToken.isRevoked());
+
+        assertEquals(user, savedToken.getUser());
+        assertFalse(savedToken.isRevoked());
+        assertNotNull(savedToken.getTokenHash());
+        assertFalse(savedToken.getTokenHash().isBlank());
+        assertTrue(savedToken.getExpiresAt().isAfter(LocalDateTime.now()));
+    }
+
+    @Test
+    void createRefreshToken_shouldReturnToken_whenUserIsValid(){
+
+        User user = new User();
+        user.setEmail("test@mail.com");
+
+        String rawToken = refreshTokenService.createRefreshToken(user);
+
+        ArgumentCaptor<RefreshToken> captor = ArgumentCaptor.forClass(RefreshToken.class);
+        verify(refreshTokenRepository).save(captor.capture());
+        RefreshToken savedToken = captor.getValue();
+
+        assertNotNull(rawToken);
+        assertFalse(rawToken.isBlank());
+
+        assertEquals(user, savedToken.getUser());
+        assertNotNull(savedToken.getTokenHash());
+        assertNotEquals(savedToken.getTokenHash(), rawToken);
+        assertFalse(savedToken.isRevoked());
+        assertFalse(savedToken.getTokenHash().isBlank());
+        assertTrue(savedToken.getExpiresAt().isAfter(LocalDateTime.now().plusDays(6)));
+
+    }
+
+    @Test
+    void hashRefreshToken_shouldReturnSameHash_whenInputIsSame(){
+
+        String rawToken = "test-refresh-token";
+
+        String firstHash = refreshTokenService.hashRefreshToken(rawToken);
+        String secondHash = refreshTokenService.hashRefreshToken(rawToken);
+
+        assertNotNull(firstHash);
+        assertEquals(secondHash, firstHash);
+
+    }
+
+    @Test
+    void hashRefreshToken_shouldReturnDifferentHash_whenInputDiffer(){
+
+        String firstRawToken = "test-refresh-token1";
+        String secondRawToken = "test-refresh-token2";
+
+        String firstHash = refreshTokenService.hashRefreshToken(firstRawToken);
+        String secondHash = refreshTokenService.hashRefreshToken(secondRawToken);
+
+        assertNotEquals(firstHash, secondHash);
+
+    }
+
+    @Test
+    void hashRefreshToken_shouldNotReturnRawToken(){
+
+        String rawToken = "test-refresh-token";
+
+        String hashToken = refreshTokenService.hashRefreshToken(rawToken);
+
+        assertNotEquals(rawToken, hashToken);
+
     }
 
 }
