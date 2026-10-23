@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import static org.mockito.Mockito.*;
@@ -126,6 +127,101 @@ public class AuthServiceTest {
 
         when(jwtService.extractClaimsForLogout(accessToken))
                 .thenThrow(new MalformedJwtException("Invalid Access Token"));
+
+        authService.LogoutService(authHeader, refreshToken);
+
+        verify(revokedAccessTokenService, never()).revokeAccessToken(anyString(), any(LocalDateTime.class));
+        verify(revokedAccessTokenService, never()).isAccessTokenRevoked(anyString());
+
+        verify(refreshTokenService).revokeRefreshToken(refreshToken);
+
+    }
+
+    @Test
+    void logout_shouldRevokedRefreshToken_whenAccessTokenIsExpired(){
+
+        String accessToken = "valid-access-token";
+        String authHeader = "Bearer " + accessToken;
+        String refreshToken = "valid-refresh-token";
+        String tokenId = "jti-123";
+
+        Claims claims = mock(Claims.class);
+        Date expiration = Date.from(
+                Instant.now().minusSeconds(60)
+        );
+
+        when(jwtService.extractClaimsForLogout(accessToken))
+                .thenReturn(claims);
+
+        when(claims.getId()).thenReturn(tokenId);
+
+        when(claims.getExpiration()).thenReturn(expiration);
+
+        authService.LogoutService(authHeader, refreshToken);
+
+        verify(revokedAccessTokenService, never()).revokeAccessToken(anyString(), any(LocalDateTime.class));
+
+        verify(refreshTokenService).revokeRefreshToken(refreshToken);
+    }
+
+    @Test
+    void logout_shouldNotRevokedAccessToken_whenTokenIdIsMissing(){
+
+        String accessToken = "valid-access-token";
+        String authHeader = "Bearer " + accessToken;
+        String refreshToken = "valid-refresh-token";
+
+        Claims claims = mock(Claims.class);
+        Date expiration = Date.from(
+                Instant.now().plusSeconds(600)
+        );
+
+        when(jwtService.extractClaimsForLogout(accessToken))
+                .thenReturn(claims);
+
+        when(claims.getId()).thenReturn(null);
+
+        when(claims.getExpiration()).thenReturn(expiration);
+
+        authService.LogoutService(authHeader, refreshToken);
+
+        verify(revokedAccessTokenService, never()).revokeAccessToken(anyString(), any(LocalDateTime.class));
+
+        verify(refreshTokenService).revokeRefreshToken(refreshToken);
+
+    }
+
+    @Test
+    void logout_shouldNotRevokeAccessToken_whenExpirationClaimsIsMissing(){
+
+        String accessToken = "valid-access-token";
+        String authHeader = "Bearer " + accessToken;
+        String refreshToken = "valid-refresh-token";
+        String tokenId = "jti-123";
+
+        Claims claims = mock(Claims.class);
+
+        when(jwtService.extractClaimsForLogout(accessToken))
+                .thenReturn(claims);
+
+        when(claims.getId()).thenReturn(tokenId);
+
+        when(claims.getExpiration()).thenReturn(null);
+
+        authService.LogoutService(authHeader, refreshToken);
+
+        verify(revokedAccessTokenService, never()).revokeAccessToken(anyString(), any(LocalDateTime.class));
+
+        verify(refreshTokenService).revokeRefreshToken(refreshToken);
+
+    }
+
+    @Test
+    void logout_shouldRevokedRefreshToken_whenAuthorizationHeaderIsMalFormed(){
+
+        String accessToken = "valid-access-token";
+        String authHeader = "InvalidAuthHeader " + accessToken;
+        String refreshToken = "valid-refresh-token";
 
         authService.LogoutService(authHeader, refreshToken);
 
