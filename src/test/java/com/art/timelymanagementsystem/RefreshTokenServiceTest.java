@@ -21,8 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RefreshTokenServiceTest {
@@ -255,6 +254,43 @@ public class RefreshTokenServiceTest {
         String hashToken = refreshTokenService.hashRefreshToken(rawToken);
 
         assertNotEquals(rawToken, hashToken);
+
+    }
+
+    @Test
+    void revokeRefreshToken_shouldRevokeAndSave_whenTokenIsValid(){
+
+        String rawToken = "raw-refresh-token";
+        String hashToken = refreshTokenService.hashRefreshToken(rawToken);
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setRevoked(false);
+        refreshToken.setExpiresAt(LocalDateTime.now().plusDays(7));
+        refreshToken.setTokenHash(hashToken);
+
+        when(refreshTokenRepository.findByTokenHash(refreshToken.getTokenHash())).thenReturn(Optional.of(refreshToken));
+
+        refreshTokenService.revokeRefreshToken(rawToken);
+        assertTrue(refreshToken.isRevoked());
+        verify(refreshTokenRepository).save(refreshToken);
+
+    }
+
+    @Test
+    void validateRefreshToken_shouldThrowException_whenTokenIsEmpty(){
+
+        String rawToken = "invalid-raw-token";
+        String hashToken = refreshTokenService.hashRefreshToken(rawToken);
+
+        when(refreshTokenRepository.findByTokenHash(hashToken)).thenReturn(Optional.empty());
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> refreshTokenService.revokeRefreshToken(rawToken)
+        );
+
+        assertEquals("Refresh token invalid", exception.getMessage());
+        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
 
     }
 

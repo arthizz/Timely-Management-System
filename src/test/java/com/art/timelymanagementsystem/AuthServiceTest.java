@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
 
@@ -229,6 +230,17 @@ public class AuthServiceTest {
         verify(revokedAccessTokenService, never()).isAccessTokenRevoked(anyString());
 
         verify(refreshTokenService).revokeRefreshToken(refreshToken);
+
+    }
+
+    @Test
+    void logout_shouldNotRevokedRefreshToken_whenRefreshTokenIsMissing(){
+
+
+        authService.LogoutService(null, null);
+
+        verify(refreshTokenService).revokeRefreshToken(null);
+
 
     }
 
