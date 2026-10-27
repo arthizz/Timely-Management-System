@@ -294,4 +294,88 @@ public class RefreshTokenServiceTest {
 
     }
 
+    @Test
+    void revokeRefreshToken_shouldThrowException_whenTokenIsAlreadyRevoked(){
+
+        String rawToken = "valid-refresh-token";
+        String hashToken = refreshTokenService.hashRefreshToken(rawToken);
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setExpiresAt(LocalDateTime.now().plusDays(7));
+        refreshToken.setRevoked(true);
+        refreshToken.setTokenHash(hashToken);
+
+        when(refreshTokenRepository.findByTokenHash(hashToken)).thenReturn(Optional.of(refreshToken));
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> refreshTokenService.revokeRefreshToken(rawToken)
+        );
+
+        assertEquals("Please login again to generate a new one", exception.getMessage());
+        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
+
+
+    }
+
+    @Test
+    void revokeRefreshToken_shouldThrowException_whenTokenIsExpired(){
+
+        String rawToken = "expired-refresh-token";
+        String hashToken = refreshTokenService.hashRefreshToken(rawToken);
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setExpiresAt(LocalDateTime.now().minusDays(1));
+        refreshToken.setRevoked(false);
+        refreshToken.setTokenHash(hashToken);
+
+        when(refreshTokenRepository.findByTokenHash(hashToken)).thenReturn(Optional.of(refreshToken));
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> refreshTokenService.revokeRefreshToken(rawToken)
+        );
+
+        assertEquals("Refresh token expired", exception.getMessage());
+        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
+
+    }
+
+    @Test
+    void revokeRefreshToken_shouldLookUpTokenUsingHashValue(){
+
+        String rawToken = "valid-refresh-token";
+        String hashToken = refreshTokenService.hashRefreshToken(rawToken);
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setExpiresAt(LocalDateTime.now().plusDays(7));
+        refreshToken.setRevoked(false);
+        refreshToken.setTokenHash(hashToken);
+
+        when(refreshTokenRepository.findByTokenHash(hashToken)).thenReturn(Optional.of(refreshToken));
+
+        refreshTokenService.revokeRefreshToken(rawToken);
+
+        verify(refreshTokenRepository).findByTokenHash(hashToken);
+
+    }
+
+    @Test
+    void generateRefreshToken_shouldReturnSafeTokenWithoutPadding(){
+
+        String safeToken = refreshTokenService.generateRefreshToken();
+
+        assertNotNull(safeToken);
+        assertEquals(43, safeToken.length());
+        assertFalse(safeToken.contains("="));
+        assertTrue(safeToken.matches("[A-Za-z0-9_-]+"));
+    }
+
+    @Test
+    void generateRefreshToken_shouldGenerateDifferentTokens(){
+
+        String safeToken1 = refreshTokenService.generateRefreshToken();
+        String safeToken2 = refreshTokenService.generateRefreshToken();
+
+        assertNotEquals(safeToken1, safeToken2);
+
+    }
+
 }
